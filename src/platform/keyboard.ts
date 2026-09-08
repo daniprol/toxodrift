@@ -47,9 +47,11 @@ export class Keyboard {
   }
 
   private keyDown = (event: KeyboardEvent): void => {
+    // Shadow-root controls (including diagnostics) retarget event.target to their host.
+    const origin = event.composedPath()[0];
     if (
-      event.target instanceof HTMLElement &&
-      ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(event.target.tagName)
+      origin instanceof HTMLElement &&
+      ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(origin.tagName)
     ) {
       return;
     }

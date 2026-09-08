@@ -31,6 +31,11 @@
   display: flex;
   gap: 5px;
 }
+/* Leave the native diagnostic panel room in its default top-right corner. */
+.network-debug .race-actions {
+  left: 8px;
+  right: auto;
+}
 .race-actions button {
   background: #110d0ada;
   font-size: 12px;

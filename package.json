@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "dev:debug": "vite --host 0.0.0.0 --mode debug",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit",
@@ -24,6 +25,7 @@
     "assets:audio": "tsx scripts/import-audio.ts",
     "dev:server": "pnpm --filter @toxodrift/server dev",
     "dev:all": "node scripts/dev-all.mjs",
+    "dev:all:debug": "node scripts/dev-all.mjs --debug",
     "build:server": "pnpm --filter @toxodrift/server build",
     "start:server": "pnpm --filter @toxodrift/server start"
   },

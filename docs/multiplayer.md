@@ -129,6 +129,10 @@ SQLite stores a unique race result and an audit snapshot of participants, rules 
 
 Guest credentials are cryptographically random and only hashes are stored on the server. Clearing browser storage loses guest access; account recovery, identity export/linking, stronger login, moderation and resistance to coordinated throwaway-account farming are not implemented. The configured points cap limits progression inflation but does not solve collusion. Before advertising a public ranked server, choose the account policy and measure concurrent race capacity and WAN behavior. No public hosting has been provisioned by this change.
 
+## Network diagnostics
+
+Use `pnpm dev:all:debug` to start both processes with the native Colyseus Room Debug Panel, or `pnpm dev:debug` for a browser connecting to an existing server. It loads when creating/joining a race, and production builds exclude it. See [the metric definitions and controls](network-debug.md).
+
 ## Validation
 
 `pnpm check` covers formatting, lint, strict types, simulation/server tests and both builds. Tests use real Colyseus SDK/WebSocket clients for admission, readiness, host transfer, authoritative controls, reconnect and result persistence. SQLite tests verify credential survival, idempotency, ties, normalization and reward caps. Original-asset tests check safe six-car starts and simulation across every circuit. `pnpm test:e2e` starts an isolated server with an in-memory database and tests two independent browser identities alongside single-player, touch and viewport regressions.

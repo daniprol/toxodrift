@@ -27,6 +27,7 @@ test('main menu offers both modes and single player supports two, four and six c
     await expect(page.locator('#standings li')).toHaveCount(cars);
     await page.locator('#leave').click();
   }
+  await expect(page.locator('#colyseus-debug-shadow-host')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 
@@ -69,6 +70,9 @@ test('two browser identities can create, join, ready and drive an online race', 
     await first.locator('#online-start').click();
     await expect(first.locator('#race-canvas')).toHaveAttribute('data-phase', 'racing');
     await expect(second.locator('#race-canvas')).toHaveAttribute('data-phase', 'racing');
+    if (process.env.VITE_NETWORK_DEBUG !== '1') {
+      await expect(first.locator('#colyseus-debug-shadow-host')).toHaveCount(0);
+    }
     await expect(first.locator('#standings li')).toHaveCount(6);
     await expect(first.locator('#pause')).not.toBeVisible();
     await expect(second.locator('#restart')).not.toBeVisible();

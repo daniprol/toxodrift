@@ -40,6 +40,8 @@ pnpm start:server     # Run the compiled server
 
 `pnpm dev` and `pnpm build` still run/build the browser game independently. Docker targets support client-only, server-only and combined hosting. Configure default server addresses in `public/config/multiplayer.jsonc` and server/ranking rules in `config/server.jsonc`. See [multiplayer setup and architecture](docs/multiplayer.md) and the [Colyseus research and design rationale](docs/multiplayer-research.md).
 
+For the Colyseus network panel and live State viewer, run `pnpm dev:all:debug` (game + server) or `pnpm dev:debug` (game only), then create/join a multiplayer race. `VITE_NETWORK_DEBUG=1 pnpm dev` also enables it. Normal runs and production builds exclude the panel. See [network metrics and debug controls](docs/network-debug.md), including why the native jitter row is unavailable with our current input protocol.
+
 ## Controls
 
 | Action                         | Keys               |

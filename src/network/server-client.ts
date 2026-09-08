@@ -8,6 +8,7 @@ import {
   RoomListingSchema,
   type RaceSettings,
 } from './protocol';
+import { enableNetworkDebug } from './debug';
 import { OnlineState } from './state';
 import type { OnlineRoom } from './remote-race';
 import { identityKey, normalizeServerUrl } from './servers';
@@ -80,6 +81,7 @@ export class RaceServer {
       .parse(await request(this.options.endpoint, '/api/leaderboard'));
   }
   async enter(options: { roomId: string } | { settings: RaceSettings }): Promise<OnlineRoom> {
+    await enableNetworkDebug();
     const client = new Client(this.options.endpoint);
     const auth = { credential: this.options.credential, protocol: PROTOCOL_VERSION };
     const room: OnlineRoom =

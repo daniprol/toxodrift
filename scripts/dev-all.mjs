@@ -4,7 +4,7 @@ if (Number(process.versions.node.split('.')[0]) < 24) {
   throw new Error('Multiplayer requires Node 24+. Use pnpm dev for the browser game alone.');
 }
 const children = [
-  spawn('pnpm', ['dev'], { stdio: 'inherit' }),
+  spawn('pnpm', [process.argv.includes('--debug') ? 'dev:debug' : 'dev'], { stdio: 'inherit' }),
   spawn('pnpm', ['dev:server'], { stdio: 'inherit' }),
 ];
 let stopping = false;
