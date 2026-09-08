@@ -1,0 +1,12 @@
+[
+  { "id": "tr0", "name": "The Arena" },
+  { "id": "tr1", "name": "Suburbia", "alternate": "West End" },
+  { "id": "tr2", "name": "Downtown", "alternate": "Newark" },
+  { "id": "tr3", "name": "Utopia", "alternate": "Complex" },
+  { "id": "tr4", "name": "Rock Zone", "alternate": "Hell Mountain" },
+  { "id": "tr5", "name": "Snake Alley", "alternate": "Desert Run" },
+  { "id": "tr6", "name": "Oasis", "alternate": "Palm Side" },
+  { "id": "tr7", "name": "Velodrome", "alternate": "Eidolon" },
+  { "id": "tr8", "name": "Holocaust", "alternate": "Toxic Dump" },
+  { "id": "tr9", "name": "Bogota", "alternate": "Borneo" },
+]

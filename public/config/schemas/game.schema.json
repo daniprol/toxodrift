@@ -1,0 +1,551 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "race": {
+      "type": "object",
+      "properties": {
+        "tickRate": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 240
+        },
+        "laps": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "countdownSeconds": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "maxRaceSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "defaultTrack": {
+          "type": "string"
+        },
+        "defaultCar": {
+          "type": "string"
+        },
+        "opponents": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "weapons": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "tickRate",
+        "laps",
+        "countdownSeconds",
+        "maxRaceSeconds",
+        "defaultTrack",
+        "defaultCar",
+        "opponents",
+        "weapons"
+      ],
+      "additionalProperties": false
+    },
+    "physics": {
+      "type": "object",
+      "properties": {
+        "drag": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "throttleDrag": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "acceleration": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "turboAcceleration": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "accelerationDivisor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "brakeDivisor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "verticalScale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "slipDivisor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "steeringMemory": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "steeringBuild": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "steeringDecay": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "collisionRadius": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "wallBounce": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "collisionDamage": {
+          "type": "number",
+          "minimum": 0
+        },
+        "terrainDrag": {
+          "minItems": 16,
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "turboCapacity": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "turboDrain": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "turboRecharge": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "drag",
+        "throttleDrag",
+        "acceleration",
+        "turboAcceleration",
+        "accelerationDivisor",
+        "brakeDivisor",
+        "verticalScale",
+        "slipDivisor",
+        "steeringMemory",
+        "steeringBuild",
+        "steeringDecay",
+        "collisionRadius",
+        "wallBounce",
+        "collisionDamage",
+        "terrainDrag",
+        "turboCapacity",
+        "turboDrain",
+        "turboRecharge"
+      ],
+      "additionalProperties": false
+    },
+    "combat": {
+      "type": "object",
+      "properties": {
+        "health": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "ammo": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "mines": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "gunInterval": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "gunRange": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "mineInterval": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "mineArmSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "mineRadius": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "mineDamage": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pickupRespawnSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pickupRadius": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "repairAmount": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "health",
+        "ammo",
+        "mines",
+        "gunInterval",
+        "gunRange",
+        "mineInterval",
+        "mineArmSeconds",
+        "mineRadius",
+        "mineDamage",
+        "pickupRespawnSeconds",
+        "pickupRadius",
+        "repairAmount"
+      ],
+      "additionalProperties": false
+    },
+    "ai": {
+      "type": "object",
+      "properties": {
+        "lookAhead": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sensorAngle": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "leftThreshold": {
+          "type": "number"
+        },
+        "rightThreshold": {
+          "type": "number"
+        },
+        "stuckSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "recoverySeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "cornerSpeedFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "brakingMargin": {
+          "type": "number",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "lookAhead",
+        "sensorAngle",
+        "leftThreshold",
+        "rightThreshold",
+        "stuckSeconds",
+        "recoverySeconds",
+        "cornerSpeedFactor",
+        "brakingMargin"
+      ],
+      "additionalProperties": false
+    },
+    "display": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 320,
+          "maximum": 1920
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 1080
+        },
+        "cameraLead": {
+          "type": "number",
+          "minimum": 0
+        },
+        "minimapWidth": {
+          "type": "integer",
+          "minimum": 32,
+          "maximum": 160
+        },
+        "maxFrameSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "colors": {
+          "minItems": 4,
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^#[0-9a-f]{6}$"
+          }
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "cameraLead",
+        "minimapWidth",
+        "maxFrameSeconds",
+        "colors"
+      ],
+      "additionalProperties": false
+    },
+    "audio": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "musicVolume": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "effectsVolume": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "engineVolume": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "readySample": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "finishSample": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "gunSample": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "collisionSample": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "enabled",
+        "musicVolume",
+        "effectsVolume",
+        "engineVolume",
+        "readySample",
+        "finishSample",
+        "gunSample",
+        "collisionSample"
+      ],
+      "additionalProperties": false
+    },
+    "controls": {
+      "type": "object",
+      "properties": {
+        "accelerate": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "brake": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "left": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "right": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "turbo": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "fire": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mine": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "pause": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "recover": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "accelerate",
+        "brake",
+        "left",
+        "right",
+        "turbo",
+        "fire",
+        "mine",
+        "pause",
+        "recover"
+      ],
+      "additionalProperties": false
+    },
+    "cars": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z]+$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sprite": {
+            "type": "string",
+            "pattern": "^[a-z]+$"
+          },
+          "engine": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "engineSample": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "steering": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "tireSlip": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "size": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "armor": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 900
+          },
+          "gunDamage": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "speedMph": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "sprite",
+          "engine",
+          "engineSample",
+          "steering",
+          "tireSlip",
+          "size",
+          "armor",
+          "gunDamage",
+          "speedMph"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "race",
+    "physics",
+    "combat",
+    "ai",
+    "display",
+    "audio",
+    "controls",
+    "cars"
+  ],
+  "additionalProperties": false
+}

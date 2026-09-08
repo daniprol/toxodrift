@@ -1,0 +1,10 @@
+{
+  "ignorePatterns": [
+    "chatgpt-thread.md",
+    ".local/**",
+    "public/assets/**",
+    "public/config/schemas/**",
+    "pnpm-lock.yaml"
+  ],
+  "singleQuote": true
+}

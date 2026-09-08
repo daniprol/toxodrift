@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": [".local/**", "dist/**", "public/assets/**"],
+  "rules": {
+    "curly": ["error", "all"]
+  }
+}

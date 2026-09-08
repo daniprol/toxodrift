@@ -1,0 +1,128 @@
+<header class="masthead">
+  <a class="brand" href="./" aria-label="ToxoDrift home">
+    <span class="brand-icon">T<span>↗</span> </span>TOXO<span>DRIFT</span>
+  </a>
+  <span class="edition">CLASSIC RACING PROJECT <span class="edition-dot">●</span> 001</span>
+</header>
+<main>
+  <section id="garage" aria-labelledby="title">
+    <div class="intro">
+      <div>
+        <p class="eyebrow">DEATH RALLY / 1996 → TYPESCRIPT</p>
+        <h1 id="title">Back on the <em>starting grid.</em></h1>
+        <p class="lede">
+          Original circuits. Original machines. A new engine.<br />Pick your ride and keep your foot
+          down.
+        </p>
+      </div>
+      <div class="race-stamp">
+        4<br />
+        <span>WHEELS.<br />NO MERCY.</span>
+      </div>
+    </div>
+    <p id="loading" role="status">Loading the garage…</p>
+    <div id="setup" hidden>
+      <div class="section-heading">
+        <h2><span>01</span> Choose your circuit</h2>
+        <span id="track-count"></span>
+      </div>
+      <div id="tracks" class="tracks" role="group" aria-label="Circuit"></div>
+      <div class="garage-bottom">
+        <div class="vehicle-section">
+          <div class="section-heading">
+            <h2><span>02</span> Pick your machine</h2>
+            <span>STOCK CLASS</span>
+          </div>
+          <div id="cars" class="cars" role="group" aria-label="Car"></div>
+        </div>
+        <form id="race-form" class="race-setup">
+          <p class="eyebrow">RACE SETUP</p>
+          <div class="settings-row">
+            <label>Laps<input id="laps" type="number" min="1" max="99" required /> </label>
+            <label
+              >Opponents<select id="opponents" aria-label="Opponents">
+                <option value="0">Solo practice</option>
+                <option value="1">1 opponent</option>
+                <option value="2">2 opponents</option>
+                <option value="3">3 opponents</option>
+              </select>
+            </label>
+          </div>
+          <label class="toggle">
+            <input id="weapons" type="checkbox" /> Weapons enabled <span>GUNS + MINES</span>
+          </label>
+          <button class="primary" id="start" type="submit">Start race <span>↗</span></button>
+          <button class="secondary" id="watch" type="button">Watch a race</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  <section id="race-screen" hidden aria-label="Race">
+    <div class="race-top">
+      <div>
+        <p class="eyebrow">LIVE FROM THE CIRCUIT</p>
+        <h1 id="race-title"></h1>
+      </div>
+      <div class="race-actions">
+        <button id="sound" type="button">Sound on</button>
+        <button id="pause" type="button">Pause</button>
+        <button id="restart" type="button">Restart</button>
+        <button id="leave" type="button">Garage ↗</button>
+      </div>
+    </div>
+    <div class="race-layout">
+      <div class="viewport">
+        <canvas id="race-canvas" tabindex="0" aria-label="Race track"></canvas>
+        <div id="overlay" class="overlay" hidden>
+          <p id="overlay-kicker" class="eyebrow"></p>
+          <h2 id="overlay-title"></h2>
+          <p id="overlay-detail"></p>
+          <button id="resume" class="primary" type="button">Resume race ↗</button>
+        </div>
+      </div>
+      <aside class="telemetry" aria-label="Race telemetry">
+        <p class="eyebrow">RACE CONTROL</p>
+        <div class="lap-counter">
+          <strong id="lap">1 / 4</strong>
+          <span>LAP</span>
+        </div>
+        <div class="time-row">
+          <span>TIME</span>
+          <output id="time">0:00.00</output>
+        </div>
+        <div class="time-row">
+          <span>BEST LAP</span>
+          <output id="best">—</output>
+        </div>
+        <div class="meter-label">
+          <span>ARMOR</span>
+          <output id="health-value">100%</output>
+        </div>
+        <meter id="health" min="0" max="100" value="100"></meter>
+        <div class="meter-label">
+          <span>TURBO</span>
+          <output id="turbo-value">100%</output>
+        </div>
+        <meter id="turbo" min="0" max="100" value="100"></meter>
+        <div class="resources">
+          <div>
+            <span>AMMO</span>
+            <strong id="ammo">100</strong>
+          </div>
+          <div>
+            <span>MINES</span>
+            <strong id="mines">8</strong>
+          </div>
+        </div>
+        <p class="eyebrow">RUNNING ORDER</p>
+        <ol id="standings"></ol>
+        <p id="race-status" role="status"></p>
+      </aside>
+    </div>
+    <div id="controls" class="controls" aria-label="Keyboard controls"></div>
+  </section>
+</main>
+<footer>
+  <span>TOXODRIFT <span class="muted">/ ENGINE IN DEVELOPMENT</span> </span>
+  <span>Original game & assets © Remedy Entertainment</span>
+</footer>
