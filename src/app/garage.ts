@@ -4,107 +4,95 @@ import type { AssetManifest, TrackDefinition } from '../config/schemas/track';
 import type { RaceSetup } from '../race/types';
 import { element } from './view';
 import { showControlBindings } from './control-bindings';
+import { installMenuNavigation } from './menu-navigation';
+import { bitmapLabel } from './menu-font';
 
 export interface GarageSelection {
   track: TrackDefinition;
   setup: RaceSetup;
 }
-
 interface GarageOptions {
   config: GameConfig;
   manifest: AssetManifest;
   onStart: (selection: GarageSelection) => void;
 }
-
+type Choice = 'track' | 'car';
 const html = (id: string) => element(id, HTMLElement);
 
-function selectCard(group: string, selectedId: string): void {
-  html(group)
-    .querySelectorAll<HTMLButtonElement>('button')
-    .forEach((card) => {
-      card.setAttribute('aria-pressed', String(card.dataset.id === selectedId));
-    });
-}
-
-/** Owns editable garage choices and emits a snapshot when a race is requested. */
+/** Owns race choices; the dialog and arrows edit the same selection. */
 export class Garage {
-  private selectedTrackId: string;
-  private selectedCarId: string;
+  private trackIndex: number;
+  private carIndex: number;
+  private loading = false;
 
   constructor(private readonly options: GarageOptions) {
     const { config, manifest } = options;
-    this.selectedTrackId = config.race.defaultTrack;
-    this.selectedCarId = config.race.defaultCar;
-
-    if (!manifest.tracks.some((track) => track.id === this.selectedTrackId)) {
-      throw new Error(`Unknown default track: ${this.selectedTrackId}`);
+    this.trackIndex = manifest.tracks.findIndex((track) => track.id === config.race.defaultTrack);
+    this.carIndex = config.cars.findIndex((car) => car.id === config.race.defaultCar);
+    if (this.trackIndex < 0 || this.carIndex < 0) {
+      throw new Error('Unknown default circuit or car');
     }
-
     element('laps', HTMLInputElement).value = String(config.race.laps);
     element('opponents', HTMLSelectElement).value = String(config.race.opponents);
     element('weapons', HTMLInputElement).checked = config.race.weapons;
-    html('track-count').textContent = `${manifest.tracks.length} ORIGINAL CIRCUITS`;
     showControlBindings(config.controls);
 
-    for (const track of [...manifest.tracks].sort(
-      (a, b) => Number(b.id === this.selectedTrackId) - Number(a.id === this.selectedTrackId),
-    )) {
-      const card = document.createElement('button');
-      card.className = 'track-card';
-      card.type = 'button';
-      card.dataset.id = track.id;
-
-      const image = document.createElement('img');
-      image.src = trackImageUrl(track.id);
-      image.alt = '';
-      image.loading = 'lazy';
-
-      const caption = document.createElement('span');
-      caption.textContent = track.name;
-
-      const number = document.createElement('small');
-      number.textContent = track.id.toUpperCase();
-      card.append(image, caption, number);
-      card.addEventListener('click', () => {
-        this.selectedTrackId = track.id;
-        selectCard('tracks', this.selectedTrackId);
+    for (const choice of ['track', 'car'] as const) {
+      const entries = choice === 'track' ? manifest.tracks : config.cars;
+      entries.forEach((entry, index) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.dataset.id = entry.id;
+        card.textContent = entry.name;
+        if ('speedMph' in entry) {
+          const portrait = document.createElement('img');
+          portrait.src = this.portraitUrl(entry.id);
+          portrait.alt = '';
+          const speed = document.createElement('small');
+          speed.textContent = `${entry.speedMph} mph`;
+          card.prepend(portrait);
+          card.append(speed);
+        }
+        card.addEventListener('click', () => {
+          if (choice === 'track') {
+            this.trackIndex = index;
+          } else {
+            this.carIndex = index;
+          }
+          this.refresh();
+          element('selection-dialog', HTMLDialogElement).close();
+        });
+        html(`${choice}s`).append(card);
       });
-      html('tracks').append(card);
+      html(`choose-${choice}`).addEventListener('click', () => this.openSelection(choice));
+      for (const [direction, step] of [
+        ['previous', -1],
+        ['next', 1],
+      ] as const) {
+        html(`${direction}-${choice}`).addEventListener('click', () => this.cycle(choice, step));
+      }
     }
-
-    for (const car of config.cars) {
-      const card = document.createElement('button');
-      card.className = 'car-card';
-      card.type = 'button';
-      card.dataset.id = car.id;
-
-      const name = document.createElement('strong');
-      name.textContent = car.name;
-
-      const speed = document.createElement('span');
-      speed.textContent = `${car.speedMph} MPH`;
-      card.append(name, speed);
-      card.addEventListener('click', () => {
-        this.selectedCarId = car.id;
-        selectCard('cars', this.selectedCarId);
-      });
-      html('cars').append(card);
-    }
-
-    selectCard('tracks', this.selectedTrackId);
-    selectCard('cars', this.selectedCarId);
-
+    html('close-selection').addEventListener('click', () =>
+      element('selection-dialog', HTMLDialogElement).close(),
+    );
     element('race-form', HTMLFormElement).addEventListener('submit', (event) => {
       event.preventDefault();
       this.start(false);
     });
-
-    element('watch', HTMLButtonElement).addEventListener('click', () => this.start(true));
+    html('watch').addEventListener('click', () => this.start(true));
+    installMenuNavigation((choice, step) => this.cycle(choice, step));
+    for (const id of ['start', 'watch', 'choose-track', 'choose-car']) {
+      bitmapLabel(html(id));
+    }
+    for (const label of html('race-form').querySelectorAll<HTMLElement>('.menu-setting > span')) {
+      bitmapLabel(label);
+    }
+    this.refresh();
   }
 
   setLoading(loading: boolean): void {
+    this.loading = loading;
     html('setup').setAttribute('aria-busy', String(loading));
-
     for (const control of html('setup').querySelectorAll<
       HTMLButtonElement | HTMLInputElement | HTMLSelectElement
     >('button, input, select')) {
@@ -112,17 +100,61 @@ export class Garage {
     }
   }
 
-  private start(spectate: boolean): void {
-    if (!element('race-form', HTMLFormElement).reportValidity()) {
+  private portraitUrl(id: string): string {
+    return `${import.meta.env.BASE_URL}assets/original/portrait-${id}.png`;
+  }
+
+  private cycle(choice: Choice, step: number): void {
+    if (this.loading) {
       return;
     }
+    if (choice === 'track') {
+      this.trackIndex =
+        (this.trackIndex + step + this.options.manifest.tracks.length) %
+        this.options.manifest.tracks.length;
+    } else {
+      this.carIndex =
+        (this.carIndex + step + this.options.config.cars.length) % this.options.config.cars.length;
+    }
+    this.refresh();
+  }
 
-    const track = this.options.manifest.tracks.find((entry) => entry.id === this.selectedTrackId)!;
+  private openSelection(choice: Choice): void {
+    html('tracks').hidden = choice !== 'track';
+    html('cars').hidden = choice !== 'car';
+    html('selection-title').textContent = choice === 'track' ? 'Circuit' : 'Car';
+    element('selection-dialog', HTMLDialogElement).showModal();
+    html(`${choice}s`).querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus();
+  }
 
+  private refresh(): void {
+    const track = this.options.manifest.tracks[this.trackIndex]!;
+    const car = this.options.config.cars[this.carIndex]!;
+    html('track-name').textContent = track.name;
+    html('car-name').textContent = car.name;
+    html('preview-track-name').textContent = track.name;
+    html('preview-car-name').textContent = car.name;
+    html('car-speed').textContent = `${car.speedMph} mph`;
+    element('track-preview', HTMLImageElement).src = trackImageUrl(track.id);
+    element('car-preview', HTMLImageElement).src = this.portraitUrl(car.id);
+    for (const [group, selected] of [
+      ['tracks', track.id],
+      ['cars', car.id],
+    ] as const) {
+      html(group)
+        .querySelectorAll<HTMLButtonElement>('button')
+        .forEach((card) => card.setAttribute('aria-pressed', String(card.dataset.id === selected)));
+    }
+  }
+
+  private start(spectate: boolean): void {
+    if (this.loading || !element('race-form', HTMLFormElement).reportValidity()) {
+      return;
+    }
     this.options.onStart({
-      track,
+      track: this.options.manifest.tracks[this.trackIndex]!,
       setup: {
-        carId: this.selectedCarId,
+        carId: this.options.config.cars[this.carIndex]!.id,
         laps: element('laps', HTMLInputElement).valueAsNumber,
         opponents: Number(element('opponents', HTMLSelectElement).value),
         weapons: element('weapons', HTMLInputElement).checked,

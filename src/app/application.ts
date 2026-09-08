@@ -1,3 +1,4 @@
+import { installDisplay } from '../platform/display';
 import { loadManifest, loadRaceAssets, type RaceAssets } from '../assets/browser-loader';
 import { parseConfig } from '../config/parse';
 import { GameConfigSchema } from '../config/schemas/game';
@@ -9,6 +10,10 @@ import { element, mountView } from './view';
 /** Composes the garage and replaces the entire session on restart or track changes. */
 export async function startApplication(root: HTMLElement): Promise<void> {
   mountView(root);
+  installDisplay([
+    element('fullscreen', HTMLButtonElement),
+    element('race-fullscreen', HTMLButtonElement),
+  ]);
 
   const loading = element('loading', HTMLElement);
   const garageScreen = element('garage', HTMLElement);
@@ -99,6 +104,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
     loading.hidden = true;
     element('setup', HTMLElement).hidden = false;
+    element('start', HTMLButtonElement).focus();
   } catch (error) {
     showError(error);
   }

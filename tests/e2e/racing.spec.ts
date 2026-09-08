@@ -8,8 +8,10 @@ test('driver can choose a race, drive, use weapons, pause, restart and return to
   page.on('pageerror', (error) => errors.push(error.message));
   await page.clock.install();
   await page.goto('/');
-  await page.getByRole('button', { name: 'Suburbia', exact: false }).click();
-  await page.getByRole('button', { name: 'Dervish 65 MPH' }).click();
+  await page.getByRole('button', { name: 'Circuit', exact: true }).click();
+  await page.getByRole('button', { name: 'Suburbia', exact: true }).click();
+  await page.getByRole('button', { name: 'Car', exact: true }).click();
+  await page.getByRole('button', { name: 'Dervish 65 mph' }).click();
   await page.getByLabel('Laps', { exact: true }).fill('2');
   await page.getByLabel('Opponents', { exact: true }).selectOption('0');
   await page.getByRole('button', { name: 'Start race' }).click();
@@ -21,6 +23,7 @@ test('driver can choose a race, drive, use weapons, pause, restart and return to
 
   await expect(track).toHaveAttribute('data-phase', 'racing');
 
+  await page.clock.runFor(3500); // Original weapon safety period after the start.
   const before = await track.screenshot();
   await page.keyboard.down('ArrowUp');
   await page.keyboard.down('Shift');
@@ -86,11 +89,16 @@ test('the garage fits a phone viewport and supports keyboard selection', async (
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
 
-  const car = page.getByRole('button', { name: 'Sentinel 80 MPH' });
+  await page.getByRole('button', { name: 'Car', exact: true }).click();
+  const car = page.getByRole('button', { name: 'Sentinel 80 mph' });
   await car.focus();
   await page.keyboard.press('Enter');
 
-  await expect(car).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(page.locator('#car-name')).toHaveText('Sentinel');
+  expect(
+    await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight),
+  ).toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
@@ -135,6 +143,7 @@ test('losing focus pauses the race and clears held controls before resuming', as
   await page.goto('/');
   await page.getByLabel('Opponents', { exact: true }).selectOption('0');
   await page.getByRole('button', { name: 'Start race' }).click();
+  await expect(page.locator('#race-canvas')).toHaveAttribute('data-phase', 'countdown');
   await page.clock.runFor(3500);
   await page.keyboard.down('ArrowUp');
   await page.keyboard.down('Shift');
@@ -166,7 +175,7 @@ test('a failed track load returns to editable setup and can be retried', async (
   await page.goto('/');
   await page.getByRole('button', { name: 'Start race' }).click();
 
-  await expect(page.getByRole('status')).toContainText('Unable to load tr1-terrain.bin');
+  await expect(page.locator('#loading')).toContainText('Unable to load tr1-terrain.bin');
   await expect(page.getByRole('button', { name: 'Start race' })).toBeEnabled();
   await page.getByRole('button', { name: 'Start race' }).click();
 

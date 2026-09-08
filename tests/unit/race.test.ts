@@ -105,7 +105,7 @@ describe('combat', () => {
     });
 
     expect(target.health).toBe(config.combat.health);
-    expect(shooter.ammo).toBe(config.combat.ammo - 1);
+    expect(shooter.ammo).toBe(config.combat.ammo - 260 / 1024);
     expect(race.state.shots[0]!.to.y).toBeGreaterThanOrEqual(288);
   });
 
@@ -125,7 +125,7 @@ describe('combat', () => {
     useWeapons(options);
     useWeapons(options);
 
-    expect(shooter!.ammo).toBe(99);
+    expect(shooter!.ammo).toBe(100 - 260 / 1024);
     expect(target!.health).toBeLessThan(100);
     expect(behind!.health).toBe(100);
   });

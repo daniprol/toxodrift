@@ -1,3 +1,4 @@
+import { HUD_ASSETS, type HudAssets, type HudAssetName } from './interface';
 import { PALETTE_BYTES, CAR_SPRITE_BYTES, DRIVING_MAP_SCALE } from './formats';
 import { ManifestSchema, type AssetManifest, type TrackDefinition } from '../config/schemas/track';
 import type { GameConfig } from '../config/schemas/game';
@@ -13,6 +14,7 @@ export interface RaceAssets {
   palette: Uint8Array;
   sprites: ReadonlyMap<string, Uint8Array>;
   scenery: Scenery;
+  hud: HudAssets;
 }
 
 async function binary(name: string, length?: number): Promise<Uint8Array> {
@@ -58,7 +60,7 @@ export async function loadRaceAssets(options: {
   const image = new Image();
   image.src = trackImageUrl(definition.id);
 
-  const [terrain, checkpoints, racingLine, palette, sprites, scenery] = await Promise.all([
+  const [terrain, checkpoints, racingLine, palette, sprites, scenery, hud] = await Promise.all([
     binary(`${definition.id}-terrain.bin`, area),
     binary(`${definition.id}-checkpoints.bin`, area / DRIVING_MAP_SCALE ** 2),
     binary(`${definition.id}-racingLine.bin`, area / DRIVING_MAP_SCALE ** 2),
@@ -69,6 +71,12 @@ export async function loadRaceAssets(options: {
       ),
     ),
     binary(`${definition.id}-scene.bin`).then(decodeScenery),
+    Promise.all(
+      Object.entries(HUD_ASSETS).map(
+        async ([name, size]) =>
+          [name as HudAssetName, await binary(`hud-${name}.bin`, size)] as const,
+      ),
+    ),
     image.decode(),
   ]);
 
@@ -77,6 +85,7 @@ export async function loadRaceAssets(options: {
     image,
     palette,
     sprites: new Map(sprites),
+    hud: new Map(hud),
     scenery: definition.id.endsWith('r')
       ? alternateScenery({ scenery, width: definition.width, height: definition.height })
       : scenery,

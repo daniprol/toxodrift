@@ -14,7 +14,7 @@ pnpm assets:setup
 pnpm dev
 ```
 
-Open the URL printed by Vite. On this workspace the original assets have already been downloaded and imported. `pnpm assets:setup` downloads the freeware installer, verifies both SHA-256 checksums, extracts it without executing it, decodes the racing assets in TypeScript, and converts tracker music with FFmpeg.
+Open the URL printed by Vite. On this workspace the original assets have already been downloaded and imported. If updating an older checkout, run `pnpm assets:import` once to extract the menu and instrument artwork. `pnpm assets:setup` downloads the freeware installer, verifies both SHA-256 checksums, extracts it without executing it, decodes the racing assets in TypeScript, and converts tracker music with FFmpeg.
 
 To use an existing installation:
 
@@ -23,7 +23,7 @@ pnpm assets:import /path/to/death-rally
 pnpm assets:audio /path/to/death-rally
 ```
 
-The directory should contain uppercase `ENGINE.BPA`, `MUSICS.BPA`, and `TR0.BPA` through `TR9.BPA`. Original files live in `.local/`; converted files live in `public/assets/original/`. Both are ignored by Git. Game assets remain Remedy's property and are not covered by the source-code license. A local build includes your imported assets; do not publish that build as a freely licensed asset bundle.
+The directory should contain uppercase `MENU.BPA`, `IBFILES.BPA`, `ENGINE.BPA`, `MUSICS.BPA`, and `TR0.BPA` through `TR9.BPA`. Original files live in `.local/`; converted files live in `public/assets/original/`. Both are ignored by Git. Game assets remain Remedy's property and are not covered by the source-code license. A local build includes your imported assets; do not publish that build as a freely licensed asset bundle.
 
 ## Controls
 
@@ -37,7 +37,11 @@ The directory should contain uppercase `ENGINE.BPA`, `MUSICS.BPA`, and `TR0.BPA`
 | Pause                          | Esc or P           |
 | Recover to last checkpoint     | R                  |
 
-The race also pauses when the tab loses focus. Use **Sound on/off** to mute. **Watch a race** uses the same simulation and authored AI maps as opponents. **Solo practice**, with weapons disabled, is useful for learning the tracks.
+The menu and race fill the viewport without scrolling. The menu uses the original 640×480 artwork, scaled proportionally; the race expands its camera view to fit wider screens. Choose **Full screen** to hide browser chrome where supported.
+
+In the menu, ↑/↓ move between settings, ←/→ change values, and Enter/Space activate buttons. Circuit and car pickers also support arrow keys; Escape closes them. Mouse and touch work throughout.
+
+On phones, race in landscape with the translucent joystick: drag up to accelerate, down to brake/reverse, and sideways to steer. Use the right-hand buttons for turbo, fire and mines; multiple fingers can hold controls together. Weapon buttons hide when weapons are disabled, and driving controls hide while paused or spectating. Turning to portrait pauses the race until you rotate back and resume. The race also pauses when the tab loses focus. Use **Sound on/off** to mute. **Watch a race** uses the same simulation and authored AI maps as opponents. **Solo practice**, with weapons disabled, is useful for learning the tracks.
 
 ## Configure
 
@@ -68,8 +72,8 @@ Unit tests cover observable driving/combat behavior, checkpoint anti-shortcut ru
 src/assets/          BPA/BPK/CMF/XM/track/scenery codecs and browser loading
 src/config/schemas/  Runtime validation and inferred public configuration types
 src/race/            Deterministic simulation; no browser or filesystem dependency
-src/rendering/       Canvas track, car and projected scenery renderers
-src/platform/        Keyboard, fixed-step clock and browser audio
+src/rendering/       Canvas track, car, projected scenery and original instrument renderers
+src/platform/        Keyboard/touch input, viewport/fullscreen, fixed-step clock and browser audio
 src/app/             Garage, session lifecycle, HUD, controls help and HTML view
 src/main.ts          Styles and application entrypoint
 scripts/             Reproducible asset import and schema generation
@@ -78,4 +82,4 @@ public/config/       Runtime configuration
 tests/              Unit, original-asset integration and browser tests
 ```
 
-Read [architecture](docs/architecture.md), [port status](docs/port-status.md), and [third-party notices](THIRD_PARTY_NOTICES.md) before extending the engine.
+Read [architecture](docs/architecture.md), [port status](docs/port-status.md), [handling and touch research](docs/controls-and-physics.md), and [third-party notices](THIRD_PARTY_NOTICES.md) before extending the engine.

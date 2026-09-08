@@ -7,6 +7,8 @@ export interface Position {
 }
 
 export interface DriverInput {
+  /** Optional analog steering: -1 right, +1 left. Buttons remain the keyboard default. */
+  steering?: number;
   accelerate: boolean;
   brake: boolean;
   left: boolean;
@@ -16,7 +18,9 @@ export interface DriverInput {
   mine: boolean;
 }
 
-export const IDLE_INPUT: Readonly<DriverInput> = Object.freeze({
+export type DrivingButton = Exclude<keyof DriverInput, 'steering'>;
+
+export const IDLE_INPUT: Readonly<Record<DrivingButton, boolean>> = Object.freeze({
   accelerate: false,
   brake: false,
   left: false,
@@ -25,6 +29,9 @@ export const IDLE_INPUT: Readonly<DriverInput> = Object.freeze({
   fire: false,
   mine: false,
 });
+
+/** Boolean actions only; analog steering is composed separately. */
+export const DRIVING_BUTTONS = Object.keys(IDLE_INPUT) as readonly DrivingButton[];
 
 export interface Racer extends Position {
   id: number;
@@ -35,6 +42,11 @@ export interface Racer extends Position {
   steeringMemory: number;
   slip: number;
   health: number;
+  armor: number;
+  velocity: Position;
+  collisionVelocity: Position;
+  collisionTurn: number;
+  collisionCooldown: number;
   turbo: number;
   ammo: number;
   mines: number;

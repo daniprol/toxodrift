@@ -2,7 +2,7 @@
 
 ## dRally
 
-Asset decoding, stock vehicle parameters, drivetrain equations, AI probes, checkpoint rules and scenery projection were adapted from [urxp/dRally](https://github.com/urxp/dRally), commit `920d85a7f3c3b95abb685bc26b5f6d67a2f4b982`. The TypeScript rewrite uses different interfaces and records known deviations in `docs/port-status.md`.
+Asset decoding, stock vehicle parameters, drivetrain equations, collision impulses, armor and weapon damage/timing, AI probes, checkpoint rules, scenery projection, menu glyph advances and instrument layout were adapted from [urxp/dRally](https://github.com/urxp/dRally), commit `920d85a7f3c3b95abb685bc26b5f6d67a2f4b982`. The TypeScript rewrite uses different interfaces and records known deviations in `docs/port-status.md`.
 
 ```text
 MIT License
@@ -34,4 +34,4 @@ Death Rally and its original graphics, sounds, music and track data belong to Re
 
 ## Other references and dependencies
 
-[DreeRally](https://github.com/enriquesomolinos/DreeRally) was consulted to cross-check names and format descriptions. Its code is not vendored. Barlow fonts are distributed through `@fontsource/barlow` and `@fontsource/barlow-condensed` under the SIL Open Font License. Package licenses remain with their installed packages. FFmpeg/libopenmpt is an external import-time tool and is not included in the application bundle.
+[DreeRally](https://github.com/enriquesomolinos/DreeRally) was consulted to cross-check names and format descriptions. Its code is not vendored. Package licenses remain with their installed packages. FFmpeg/libopenmpt is an external import-time tool and is not included in the application bundle.

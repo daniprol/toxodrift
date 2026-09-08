@@ -19,6 +19,7 @@ interface RaceRendererOptions {
 }
 
 export class RaceRenderer {
+  private readonly resize: ResizeObserver;
   private readonly scenery: SceneryRenderer;
   private readonly context: CanvasRenderingContext2D;
   private readonly atlases = new Map<string, HTMLCanvasElement>();
@@ -34,6 +35,19 @@ export class RaceRenderer {
       throw new Error('This browser does not support Canvas 2D');
     }
 
+    this.resize = new ResizeObserver(() => {
+      const bounds = canvas.getBoundingClientRect();
+      if (bounds.height === 0) {
+        return;
+      }
+      canvas.width = Math.max(
+        1,
+        Math.round((config.display.height * bounds.width) / bounds.height),
+      );
+      canvas.height = config.display.height;
+      context.imageSmoothingEnabled = false;
+    });
+    this.resize.observe(canvas);
     this.context = context;
     this.scenery = new SceneryRenderer(assets.scenery, assets.palette);
     context.imageSmoothingEnabled = false;
@@ -86,7 +100,6 @@ export class RaceRenderer {
       center: { x: cameraX + canvas.width / 2, y: cameraY + canvas.height / 2 },
     });
     context.restore();
-    this.drawMinimap(state);
   }
 
   private drawPickups(state: RaceState): void {
@@ -142,17 +155,6 @@ export class RaceRenderer {
         CAR_FRAME_SIZE,
       );
       context.filter = 'none';
-      context.fillStyle = color;
-      context.font = 'bold 8px monospace';
-      context.textAlign = 'center';
-      context.fillText(racer.id === 0 ? 'YOU' : String(racer.id + 1), racer.x, racer.y - 24);
-
-      if (racer.health < config.combat.health) {
-        context.fillStyle = '#30170d';
-        context.fillRect(racer.x - 12, racer.y + 22, 24, 2);
-        context.fillStyle = color;
-        context.fillRect(racer.x - 12, racer.y + 22, (24 * racer.health) / config.combat.health, 2);
-      }
     }
   }
 
@@ -169,27 +171,7 @@ export class RaceRenderer {
     }
   }
 
-  private drawMinimap(state: RaceState): void {
-    const { assets, config, canvas } = this.options;
-    const context = this.context;
-    const mapHeight =
-      (config.display.minimapWidth * assets.track.definition.height) /
-      assets.track.definition.width;
-    const mapX = canvas.width - config.display.minimapWidth - 12;
-    context.fillStyle = '#121510cc';
-    context.fillRect(mapX - 4, 8, config.display.minimapWidth + 8, mapHeight + 8);
-    context.globalAlpha = 0.7;
-    context.drawImage(assets.image, mapX, 12, config.display.minimapWidth, mapHeight);
-    context.globalAlpha = 1;
-
-    for (const racer of state.racers) {
-      context.fillStyle = config.display.colors[racer.id]!;
-      context.fillRect(
-        mapX + (racer.x / assets.track.definition.width) * config.display.minimapWidth - 2,
-        12 + (racer.y / assets.track.definition.height) * mapHeight - 2,
-        4,
-        4,
-      );
-    }
+  dispose(): void {
+    this.resize.disconnect();
   }
 }

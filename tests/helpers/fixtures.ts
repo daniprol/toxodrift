@@ -43,7 +43,15 @@ export function testRace(
   options: { opponents?: number; weapons?: boolean; track?: TrackData; config?: GameConfig } = {},
 ): Race {
   const suppliedConfig = options.config ?? gameConfig();
-  const config = { ...suppliedConfig, race: { ...suppliedConfig.race, countdownSeconds: 0 } };
+  const config = {
+    ...suppliedConfig,
+    race: { ...suppliedConfig.race, countdownSeconds: 0 },
+    combat: {
+      ...suppliedConfig.combat,
+      weaponSafetyTicks: options.config?.combat.weaponSafetyTicks ?? 0,
+    },
+  };
+  // Zero skips the weapon safety period in instant-race fixtures.
 
   return new Race({
     track: options.track ?? openTrack(),

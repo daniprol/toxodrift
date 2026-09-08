@@ -1,5 +1,5 @@
 import type { GameConfig } from '../config/schemas/game';
-import { IDLE_INPUT, type DriverInput } from '../race/types';
+import { DRIVING_BUTTONS, IDLE_INPUT, type DriverInput } from '../race/types';
 
 interface KeyboardOptions {
   target: Window;
@@ -30,7 +30,7 @@ export class Keyboard {
   read(): DriverInput {
     const input = { ...IDLE_INPUT };
 
-    for (const action of Object.keys(input) as (keyof DriverInput)[]) {
+    for (const action of DRIVING_BUTTONS) {
       input[action] = this.options.controls[action].some((key) => this.pressed.has(key));
     }
 

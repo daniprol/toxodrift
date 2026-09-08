@@ -1,128 +1,119 @@
-<header class="masthead">
-  <a class="brand" href="./" aria-label="ToxoDrift home">
-    <span class="brand-icon">T<span>↗</span> </span>TOXO<span>DRIFT</span>
-  </a>
-  <span class="edition">CLASSIC RACING PROJECT <span class="edition-dot">●</span> 001</span>
-</header>
 <main>
-  <section id="garage" aria-labelledby="title">
-    <div class="intro">
-      <div>
-        <p class="eyebrow">DEATH RALLY / 1996 → TYPESCRIPT</p>
-        <h1 id="title">Back on the <em>starting grid.</em></h1>
-        <p class="lede">
-          Original circuits. Original machines. A new engine.<br />Pick your ride and keep your foot
-          down.
-        </p>
-      </div>
-      <div class="race-stamp">
-        4<br />
-        <span>WHEELS.<br />NO MERCY.</span>
-      </div>
-    </div>
-    <p id="loading" role="status">Loading the garage…</p>
-    <div id="setup" hidden>
-      <div class="section-heading">
-        <h2><span>01</span> Choose your circuit</h2>
-        <span id="track-count"></span>
-      </div>
-      <div id="tracks" class="tracks" role="group" aria-label="Circuit"></div>
-      <div class="garage-bottom">
-        <div class="vehicle-section">
-          <div class="section-heading">
-            <h2><span>02</span> Pick your machine</h2>
-            <span>STOCK CLASS</span>
+  <section id="garage" aria-label="Race setup">
+    <div id="menu-stage">
+      <h1 class="sr-only">Death Rally</h1>
+      <p id="loading" role="status">Loading…</p>
+      <div id="setup" hidden>
+        <form id="race-form" class="metal-panel">
+          <div class="menu-choice">
+            <button id="choose-track" type="button" data-menu-row>Circuit</button>
+            <button id="previous-track" type="button" aria-label="Previous circuit">‹</button>
+            <output id="track-name"></output>
+            <button id="next-track" type="button" aria-label="Next circuit">›</button>
           </div>
-          <div id="cars" class="cars" role="group" aria-label="Car"></div>
-        </div>
-        <form id="race-form" class="race-setup">
-          <p class="eyebrow">RACE SETUP</p>
-          <div class="settings-row">
-            <label>Laps<input id="laps" type="number" min="1" max="99" required /> </label>
-            <label
-              >Opponents<select id="opponents" aria-label="Opponents">
-                <option value="0">Solo practice</option>
-                <option value="1">1 opponent</option>
-                <option value="2">2 opponents</option>
-                <option value="3">3 opponents</option>
-              </select>
-            </label>
+          <div class="menu-choice">
+            <button id="choose-car" type="button" data-menu-row>Car</button>
+            <button id="previous-car" type="button" aria-label="Previous car">‹</button>
+            <output id="car-name"></output>
+            <button id="next-car" type="button" aria-label="Next car">›</button>
           </div>
-          <label class="toggle">
-            <input id="weapons" type="checkbox" /> Weapons enabled <span>GUNS + MINES</span>
-          </label>
-          <button class="primary" id="start" type="submit">Start race <span>↗</span></button>
-          <button class="secondary" id="watch" type="button">Watch a race</button>
+          <label class="menu-setting"
+            ><span>Laps</span
+            ><input id="laps" data-menu-row type="number" min="1" max="99" required
+          /></label>
+          <label class="menu-setting"
+            ><span>Opponents</span
+            ><select id="opponents" data-menu-row>
+              <option value="0">Solo practice</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select></label
+          >
+          <label class="menu-setting"
+            ><span>Weapons</span
+            ><input id="weapons" data-menu-row type="checkbox" aria-label="Weapons enabled"
+          /></label>
+          <button class="menu-action" id="start" data-menu-row type="submit">Start race</button>
+          <button class="menu-action" id="watch" data-menu-row type="button">Watch a race</button>
         </form>
+        <aside class="preview-panel metal-panel" aria-label="Selection preview">
+          <img id="track-preview" alt="" />
+          <span id="preview-track-name"></span>
+          <img id="car-preview" alt="" />
+          <span id="preview-car-name"></span>
+          <span id="car-speed"></span>
+        </aside>
+        <div class="menu-footer">
+          <span>↑ ↓ Select · ← → Change · Enter Confirm</span
+          ><button id="fullscreen" type="button">Full screen</button>
+        </div>
       </div>
+      <dialog id="selection-dialog" class="metal-panel" aria-labelledby="selection-title">
+        <div class="selection-heading">
+          <h2 id="selection-title">Circuit</h2>
+          <button id="close-selection" type="button" aria-label="Close selection">×</button>
+        </div>
+        <div id="tracks" class="selection-grid" role="group" aria-label="Circuit"></div>
+        <div id="cars" class="selection-grid" role="group" aria-label="Car" hidden></div>
+      </dialog>
     </div>
   </section>
   <section id="race-screen" hidden aria-label="Race">
-    <div class="race-top">
-      <div>
-        <p class="eyebrow">LIVE FROM THE CIRCUIT</p>
-        <h1 id="race-title"></h1>
-      </div>
+    <canvas id="hud-canvas" width="64" height="200" aria-label="Race instruments"></canvas>
+    <div class="viewport">
+      <canvas id="race-canvas" tabindex="0" aria-label="Race track"></canvas>
       <div class="race-actions">
-        <button id="sound" type="button">Sound on</button>
-        <button id="pause" type="button">Pause</button>
-        <button id="restart" type="button">Restart</button>
-        <button id="leave" type="button">Garage ↗</button>
+        <button id="race-fullscreen" type="button">Full screen</button>
+        <button id="sound" type="button">Sound on</button
+        ><button id="pause" type="button">Pause</button>
+        <button id="restart" type="button">Restart</button
+        ><button id="leave" type="button">Garage</button>
       </div>
-    </div>
-    <div class="race-layout">
-      <div class="viewport">
-        <canvas id="race-canvas" tabindex="0" aria-label="Race track"></canvas>
-        <div id="overlay" class="overlay" hidden>
-          <p id="overlay-kicker" class="eyebrow"></p>
+      <div id="overlay" class="overlay" hidden>
+        <div class="metal-panel">
           <h2 id="overlay-title"></h2>
           <p id="overlay-detail"></p>
-          <button id="resume" class="primary" type="button">Resume race ↗</button>
+          <button id="resume" type="button">Resume race</button>
+          <div id="controls" class="controls" aria-label="Keyboard controls"></div>
         </div>
       </div>
-      <aside class="telemetry" aria-label="Race telemetry">
-        <p class="eyebrow">RACE CONTROL</p>
-        <div class="lap-counter">
-          <strong id="lap">1 / 4</strong>
-          <span>LAP</span>
-        </div>
-        <div class="time-row">
-          <span>TIME</span>
-          <output id="time">0:00.00</output>
-        </div>
-        <div class="time-row">
-          <span>BEST LAP</span>
-          <output id="best">—</output>
-        </div>
-        <div class="meter-label">
-          <span>ARMOR</span>
-          <output id="health-value">100%</output>
-        </div>
-        <meter id="health" min="0" max="100" value="100"></meter>
-        <div class="meter-label">
-          <span>TURBO</span>
-          <output id="turbo-value">100%</output>
-        </div>
-        <meter id="turbo" min="0" max="100" value="100"></meter>
-        <div class="resources">
-          <div>
-            <span>AMMO</span>
-            <strong id="ammo">100</strong>
-          </div>
-          <div>
-            <span>MINES</span>
-            <strong id="mines">8</strong>
+      <div id="touch-controls" aria-label="Touch controls">
+        <div
+          id="joystick"
+          role="group"
+          aria-label="Driving joystick"
+          aria-description="Drag up to accelerate, down to brake or reverse, and sideways to steer."
+        >
+          <div class="stick-base" aria-hidden="true">
+            <span class="stick-arrows">↑<br />‹ &nbsp; ›<br />↓</span
+            ><span class="stick-thumb"></span>
           </div>
         </div>
-        <p class="eyebrow">RUNNING ORDER</p>
-        <ol id="standings"></ol>
-        <p id="race-status" role="status"></p>
-      </aside>
+        <div class="touch-actions">
+          <button data-drive="mine" data-weapon aria-label="Drop mine">
+            <span aria-hidden="true">✹</span><small>Mine</small>
+          </button>
+          <button data-drive="turbo" aria-label="Turbo">
+            <span aria-hidden="true">»</span><small>Turbo</small>
+          </button>
+          <button data-drive="fire" data-weapon aria-label="Fire">
+            <span aria-hidden="true">⌖</span><small>Fire</small>
+          </button>
+        </div>
+        <button id="recover" type="button">Recover</button>
+      </div>
     </div>
-    <div id="controls" class="controls" aria-label="Keyboard controls"></div>
+    <aside class="sr-only" aria-label="Race telemetry">
+      <h2 id="race-title"></h2>
+      <span id="lap"></span><output id="time"></output><output id="best"></output>
+      <meter id="health" min="0" max="100" value="100" aria-label="Armor"></meter
+      ><output id="health-value"></output>
+      <meter id="turbo" min="0" max="100" value="100" aria-label="Turbo"></meter
+      ><output id="turbo-value"></output> <span id="ammo"></span><span id="mines"></span>
+      <ol id="standings"></ol>
+      <p id="race-status" role="status"></p>
+    </aside>
+    <div id="rotate-message"><span>↻</span>Turn your phone to race</div>
   </section>
 </main>
-<footer>
-  <span>TOXODRIFT <span class="muted">/ ENGINE IN DEVELOPMENT</span> </span>
-  <span>Original game & assets © Remedy Entertainment</span>
-</footer>

@@ -1,3 +1,4 @@
+import { damageFromImpact } from './damage';
 import { sampleMap, type TrackData } from '../assets/track';
 import type { GameConfig } from '../config/schemas/game';
 import { clamp, DEGREES_TO_RADIANS, forward, normalizeDirection } from './math';
@@ -49,16 +50,17 @@ export function integrateCar(options: IntegrateCarOptions): Position {
     racer.speed *= physics.drag;
   }
 
-  const steer = Number(input.left) - Number(input.right);
+  const steer =
+    input.steering === undefined
+      ? Number(input.left) - Number(input.right)
+      : clamp(input.steering, -1, 1);
   const turn = racer.car.steering * steeringScale;
   const pivot =
     ((racer.car.size * steer * turn) / STEERING_PIVOT_DIVISOR) * (1 + (steer * racer.slip) / 18);
-  racer.direction = normalizeDirection(racer.direction + steer * turn);
-  racer.steeringMemory = clamp(
-    racer.steeringMemory + steer * physics.steeringBuild,
-    -physics.steeringMemory,
-    physics.steeringMemory,
-  );
+  racer.direction = normalizeDirection(racer.direction + steer * turn + racer.collisionTurn);
+  if (steer !== 0 && racer.steeringMemory * Math.sign(steer) < physics.steeringMemory) {
+    racer.steeringMemory += steer * physics.steeringBuild;
+  }
   racer.steeringMemory -=
     Math.sign(racer.steeringMemory) *
     Math.min(Math.abs(racer.steeringMemory), physics.steeringDecay);
@@ -71,8 +73,8 @@ export function integrateCar(options: IntegrateCarOptions): Position {
   const scale = magnitude === 0 ? 1 : Math.abs(racer.speed) / magnitude;
 
   return {
-    x: x * scale - Math.cos(angle) * pivot,
-    y: y * scale + Math.sin(angle) * pivot * physics.verticalScale,
+    x: x * scale - Math.cos(angle) * pivot + racer.collisionVelocity.x,
+    y: y * scale + Math.sin(angle) * pivot * physics.verticalScale + racer.collisionVelocity.y,
   };
 }
 
@@ -154,10 +156,8 @@ export function moveCar(options: MoveCarOptions): void {
   }
 
   if (collided) {
-    racer.health = Math.max(
-      0,
-      racer.health - Math.abs(racer.speed) * config.physics.collisionDamage,
-    );
+    damageFromImpact(racer, racer.speed * racer.speed * config.physics.collisionDamage);
+    racer.collisionVelocity = { x: 0, y: 0 };
     racer.speed *= -config.physics.wallBounce;
   }
 

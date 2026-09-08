@@ -1,3 +1,4 @@
+import { importInterface } from './lib/import-interface';
 import { PALETTE_CHANNELS, PALETTE_CHANNEL_SCALE } from '../src/assets/formats';
 import { PALETTE_BYTES, CAR_SPRITE_BYTES } from '../src/assets/formats';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -85,4 +86,5 @@ for (const car of config.cars) {
 }
 
 await writeFile(resolve(DESTINATION, 'manifest.json'), JSON.stringify({ version: 1, tracks }));
+await importInterface(SOURCE, DESTINATION);
 console.log('Original racing assets ready. Run pnpm dev.');

@@ -61,7 +61,7 @@ describe('driving', () => {
       });
     }
 
-    expect(racer.direction).toBeCloseTo(72);
+    expect(racer.direction).toBeCloseTo((40 * 3.75) / 1.8);
     expect(racer.slip).toBeGreaterThan(0);
     integrateCar({ racer, input: IDLE_INPUT, config, steeringScale: 1 });
 

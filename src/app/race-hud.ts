@@ -30,7 +30,7 @@ export function updateRaceHud(options: RaceHudOptions): void {
   element('turbo', HTMLMeterElement).value = turbo;
   html('health-value').textContent = `${health}%`;
   html('turbo-value').textContent = `${turbo}%`;
-  html('ammo').textContent = String(player.ammo);
+  html('ammo').textContent = String(Math.ceil(player.ammo));
   html('mines').textContent = String(player.mines);
   html('standings').replaceChildren(
     ...standings(state).map((racer, index) => {
@@ -48,25 +48,24 @@ export function updateRaceHud(options: RaceHudOptions): void {
   html('race-status').textContent = raceStatus(state, spectate);
 
   html('overlay').hidden = state.phase === 'racing';
+  html('overlay').dataset.phase = state.phase;
+  html('controls').hidden = state.phase !== 'paused';
   button('resume').hidden = state.phase !== 'paused';
   button('pause').textContent = state.phase === 'paused' ? 'Resume' : 'Pause';
   button('pause').disabled = state.phase === 'finished';
 
   if (state.phase === 'countdown') {
-    html('overlay-kicker').textContent = 'ENGINES READY';
     html('overlay-title').textContent = String(Math.ceil(state.countdown));
-    html('overlay-detail').textContent = 'Hold accelerate. Find your line.';
+    html('overlay-detail').textContent = '';
   }
 
   if (state.phase === 'paused') {
-    html('overlay-kicker').textContent = 'TAKE A BREATHER';
     html('overlay-title').textContent = 'Race paused';
-    html('overlay-detail').textContent = 'Your race is right where you left it.';
+    html('overlay-detail').textContent = '';
   }
 
   if (state.phase === 'finished') {
     const position = standings(state).findIndex((racer) => racer.id === 0) + 1;
-    html('overlay-kicker').textContent = 'CHEQUERED FLAG';
     html('overlay-title').textContent = finishTitle({
       player,
       position,

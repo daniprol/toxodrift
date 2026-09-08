@@ -1,3 +1,4 @@
+import { raceArmor } from './damage';
 import { drivingFactors, sampleMap } from '../assets/track';
 import { driveOpponent } from './ai';
 import { updateCombat, useWeapons } from './combat';
@@ -13,6 +14,7 @@ import {
   type RaceState,
 } from './types';
 
+// Duke Nukem (driver 1) receives the original 2.2× armor bonus, capped at 900.
 const OPPONENT_NAMES = ['You', 'Duke Nukem', 'Jane Honda', 'Nasty Nick'];
 const MINIMUM_MOVEMENT_PER_TICK = 0.2;
 const PICKUP_KINDS = ['repair', 'ammo', 'turbo'] as const;
@@ -52,6 +54,11 @@ export class Race {
         steeringMemory: 0,
         slip: 0,
         health: config.combat.health,
+        armor: raceArmor(car.armor, id === 0, id === 1 ? 2.2 : 1),
+        velocity: { x: 0, y: 0 },
+        collisionVelocity: { x: 0, y: 0 },
+        collisionTurn: 0,
+        collisionCooldown: 0,
         turbo: config.physics.turboCapacity,
         ammo: options.weapons ? config.combat.ammo : 0,
         mines: options.weapons ? config.combat.mines : 0,
@@ -125,6 +132,11 @@ export class Race {
     player.speed = 0;
     player.slip = 0;
     player.steeringMemory = 0;
+    player.velocity = { x: 0, y: 0 };
+    player.collisionVelocity = { x: 0, y: 0 };
+    player.collisionTurn = 0;
+    player.collisionCooldown = 0;
+    player.stuckTicks = 0;
   }
 
   step(playerInput: DriverInput = IDLE_INPUT): void {
@@ -180,6 +192,7 @@ export class Race {
     const secondsPerTick = 1 / config.race.tickRate;
     if (racer.health <= 0 || racer.finishedAt !== null) {
       racer.speed = 0;
+      racer.velocity = { x: 0, y: 0 };
       return;
     }
 
@@ -193,9 +206,11 @@ export class Race {
       racer,
       input,
       config,
-      steeringScale: drivingFactors(track, zone).steering,
+      steeringScale: racer.id === 0 && !spectate ? 1 : drivingFactors(track, zone).steering,
     });
+    racer.collisionCooldown = Math.max(0, racer.collisionCooldown - 1);
     moveCar({ racer, movement, track, config });
+    racer.velocity = { x: racer.x - previousPosition.x, y: racer.y - previousPosition.y };
     racer.stuckTicks =
       Math.hypot(racer.x - previousPosition.x, racer.y - previousPosition.y) <
       MINIMUM_MOVEMENT_PER_TICK

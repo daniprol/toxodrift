@@ -1,0 +1,223 @@
+#garage {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 75% 75%, #3a0905, #090302 70%);
+}
+#menu-stage {
+  image-rendering: pixelated;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 640px;
+  height: 480px;
+  transform: translate(-50%, -50%) scale(var(--menu-scale, 1));
+  background: var(--menu-background) center / cover;
+}
+#loading {
+  position: absolute;
+  top: 90px;
+  left: 30px;
+  right: 30px;
+  padding: 12px;
+  background: #130503;
+}
+#loading.error {
+  color: #ffd7ac;
+  z-index: 5;
+}
+#race-form {
+  position: absolute;
+  left: 28px;
+  top: 108px;
+  width: 365px;
+  height: 305px;
+  padding: 15px 16px;
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+}
+.menu-choice {
+  display: grid;
+  grid-template-columns: 112px 20px 1fr 20px;
+  align-items: center;
+}
+.menu-choice button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  font-size: 23px;
+}
+.menu-choice .bitmap-text,
+.menu-setting .bitmap-text {
+  transform: scale(0.8);
+  transform-origin: left center;
+}
+.menu-choice button:not(:first-child) {
+  text-align: center;
+}
+.menu-choice output {
+  font-size: 15px;
+  text-align: center;
+}
+.menu-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 23px;
+  padding-right: 8px;
+}
+.menu-setting input[type='number'] {
+  width: 65px;
+  padding: 1px 5px;
+  font-size: 18px;
+}
+.menu-setting select {
+  width: 145px;
+  font-size: 17px;
+  padding: 2px;
+  color-scheme: dark;
+}
+.menu-setting input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  accent-color: #a44f20;
+}
+.menu-action {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-size: 26px;
+  padding: 0;
+}
+.menu-action:focus-visible,
+.menu-choice button:first-child:focus-visible {
+  outline: 0;
+  color: #fff8e9;
+  text-shadow: 1px 1px #ba632c;
+}
+.menu-action:focus-visible::before,
+.menu-choice button:first-child:focus-visible::before {
+  content: '›';
+  position: absolute;
+  left: 2px;
+  color: #e6d6b9;
+}
+.preview-panel {
+  position: absolute;
+  top: 108px;
+  right: 28px;
+  width: 200px;
+  height: 305px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 7px;
+}
+#track-preview {
+  width: 180px;
+  height: 112px;
+  object-fit: cover;
+  border: 1px solid #534b41;
+}
+#car-preview {
+  width: 144px;
+  height: 96px;
+  margin-top: 1px;
+}
+#car-speed {
+  color: #a8947b;
+  font-size: 13px;
+}
+.menu-footer {
+  position: absolute;
+  bottom: 22px;
+  left: 28px;
+  right: 28px;
+  border-top: 2px ridge #665d54;
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+.menu-footer button {
+  padding: 4px 8px;
+}
+#selection-dialog {
+  position: fixed;
+  transform: translate(-50%, -50%) scale(var(--menu-scale, 1));
+  width: 584px;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  left: 50%;
+  top: 50%;
+  height: 326px;
+  color: inherit;
+  padding: 12px;
+}
+#selection-dialog::backdrop {
+  background: #000b;
+}
+.selection-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.selection-heading h2 {
+  margin: 0;
+  font-size: 23px;
+  font-weight: normal;
+}
+.selection-heading button {
+  font-size: 23px;
+  width: 32px;
+}
+.selection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.selection-grid button {
+  min-height: 31px;
+  padding: 5px;
+  font-size: 15px;
+}
+.selection-grid button[aria-pressed='true'] {
+  color: #fff7df;
+  border-color: #d9b77b;
+  background: #442216;
+}
+#cars button {
+  height: 112px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 2px;
+}
+#cars img {
+  width: 96px;
+  height: 64px;
+}
+#cars small {
+  font-size: 12px;
+}
+.bitmap-text {
+  display: inline-flex;
+  height: 32px;
+  align-items: start;
+  vertical-align: middle;
+}
+.bitmap-text i {
+  display: block;
+  height: 32px;
+  background-image: var(--menu-font);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+#setup {
+  position: absolute;
+  inset: 0;
+}

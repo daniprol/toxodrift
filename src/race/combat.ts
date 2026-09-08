@@ -1,3 +1,4 @@
+import { damageCar } from './damage';
 import { sampleMap, type TrackData } from '../assets/track';
 import type { GameConfig } from '../config/schemas/game';
 import { distance, forward } from './math';
@@ -7,11 +8,6 @@ const BULLET_STEP = 0.5;
 const GUN_MUZZLE_DISTANCE = 15;
 const MINE_DROP_DISTANCE = 18;
 const SHOT_VISIBLE_SECONDS = 0.08;
-const ARMOR_DIVISOR = 1024;
-
-export function damageCar(racer: Racer, damage: number): void {
-  racer.health = Math.max(0, racer.health - damage * (1 - racer.car.armor / ARMOR_DIVISOR));
-}
 
 interface UseWeaponsOptions {
   racer: Racer;
@@ -23,10 +19,17 @@ interface UseWeaponsOptions {
 
 export function useWeapons(options: UseWeaponsOptions): void {
   const { racer, input, state, track, config } = options;
+  if (
+    (config.combat.weaponSafetyTicks > 0 && state.tick <= config.combat.weaponSafetyTicks) ||
+    racer.health <= 0 ||
+    racer.finishedAt !== null
+  ) {
+    return;
+  }
   const heading = forward(racer.direction);
 
-  if (input.fire && racer.ammo > 0 && racer.gunCooldown <= 0) {
-    racer.ammo--;
+  if (input.fire && racer.ammo > 0 && racer.gunCooldown <= 1e-9) {
+    racer.ammo = Math.max(0, racer.ammo - config.combat.gunAmmoCost);
     racer.gunCooldown = config.combat.gunInterval;
 
     const origin = {

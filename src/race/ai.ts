@@ -1,6 +1,6 @@
 import { drivingFactors, sampleMap, type TrackData } from '../assets/track';
 import type { GameConfig } from '../config/schemas/game';
-import { DEGREES_TO_RADIANS, forward } from './math';
+import { clamp, DEGREES_TO_RADIANS, forward } from './math';
 import { IDLE_INPUT, type DriverInput, type Racer } from './types';
 
 const RACING_LINE_INVERSION = 16;
@@ -29,8 +29,8 @@ export function driveOpponent(options: DriveOpponentOptions): DriverInput {
       sampleMap({
         track,
         map: 'racingLine',
-        x: racer.x + vector.x * config.ai.lookAhead,
-        y: racer.y + vector.y * config.ai.lookAhead,
+        x: clamp(racer.x + vector.x * config.ai.lookAhead, 0, track.definition.width - 1),
+        y: clamp(racer.y + vector.y * config.ai.lookAhead, 0, track.definition.height - 1),
       })
     );
   };
