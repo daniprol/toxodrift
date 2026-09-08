@@ -104,4 +104,6 @@ export interface RaceSetup {
 export interface RaceOptions extends RaceSetup {
   track: TrackData;
   config: GameConfig;
+  /** Explicit human slots; absent slots use AI. Online races wait for all racers. */
+  drivers?: { id: number; name: string; carId: string }[];
 }

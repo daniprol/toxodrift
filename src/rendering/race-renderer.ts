@@ -136,7 +136,7 @@ export class RaceRenderer {
     const { config } = this.options;
 
     for (const racer of state.racers) {
-      const color = config.display.colors[racer.id]!;
+      const color = config.display.colors[racer.id % config.display.colors.length]!;
       const atlas = this.atlases.get(`${racer.car.id}:${color}`)!;
 
       if (racer.health <= 0) {

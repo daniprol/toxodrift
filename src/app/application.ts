@@ -1,3 +1,6 @@
+import type { Multiplayer, OnlineStart } from './multiplayer';
+import { MultiplayerConfigSchema } from '../network/servers';
+import { bitmapLabel } from './menu-font';
 import { installDisplay } from '../platform/display';
 import { loadManifest, loadRaceAssets, type RaceAssets } from '../assets/browser-loader';
 import { parseConfig } from '../config/parse';
@@ -42,6 +45,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
     const manifest = await loadManifest();
     let session: RaceSession | null = null;
+    let onlineRace = false;
     let restartOptions: { assets: RaceAssets; setup: RaceSetup } | null = null;
 
     function beginRace(options: { assets: RaceAssets; setup: RaceSetup }): void {
@@ -53,6 +57,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       element('race-title', HTMLElement).textContent = options.assets.track.definition.name;
       soundButton.textContent = config.audio.enabled ? 'Sound on' : 'Sound off';
 
+      onlineRace = false;
+      element('pause', HTMLButtonElement).hidden = false;
+      element('restart', HTMLButtonElement).hidden = false;
+      element('leave', HTMLButtonElement).textContent = 'Garage';
+      element('network-status', HTMLElement).hidden = true;
       session = new RaceSession({ canvas, config, ...options });
       restartOptions = options;
     }
@@ -71,6 +80,84 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       } finally {
         garage.setLoading(false);
       }
+    }
+
+    function showModes(): void {
+      element('setup', HTMLElement).hidden = true;
+      element('mode-menu', HTMLElement).hidden = false;
+      element('single-player', HTMLButtonElement).focus();
+    }
+    function beginOnline(options: OnlineStart): void {
+      session?.dispose();
+      onlineRace = true;
+      restartOptions = null;
+      garageScreen.hidden = true;
+      raceScreen.hidden = false;
+      element('race-title', HTMLElement).textContent = options.assets.track.definition.name;
+      element('pause', HTMLButtonElement).hidden = true;
+      element('restart', HTMLButtonElement).hidden = true;
+      element('leave', HTMLButtonElement).textContent = 'Multiplayer';
+      // Server owns gameplay settings; personal controls, colors and audio stay local.
+      const onlineConfig = {
+        ...options.config,
+        controls: config.controls,
+        audio: config.audio,
+        display: config.display,
+      };
+      session = new RaceSession({
+        canvas,
+        assets: options.assets,
+        config: onlineConfig,
+        setup: {
+          carId: options.settings.carId,
+          laps: options.settings.laps,
+          opponents: options.settings.participants - 1,
+          weapons: options.settings.weapons,
+        },
+        online: {
+          room: options.room,
+          racerId: options.racerId,
+          inputRate: options.inputRate,
+          interpolationMs: options.interpolationMs,
+        },
+      });
+    }
+    // Multiplayer config is loaded on demand, so offline play has no server dependency.
+    let multiplayer: Multiplayer | undefined;
+    element('multiplayer-button', HTMLButtonElement).addEventListener('click', () => {
+      void (async () => {
+        if (!multiplayer) {
+          const { Multiplayer } = await import('./multiplayer');
+          const response = await fetch(`${import.meta.env.BASE_URL}config/multiplayer.jsonc`);
+          if (!response.ok) {
+            throw new Error('Unable to load multiplayer configuration');
+          }
+          const multiplayerConfig = parseConfig({
+            text: await response.text(),
+            schema: MultiplayerConfigSchema,
+            name: 'multiplayer.jsonc',
+          });
+          multiplayer = new Multiplayer({
+            config: multiplayerConfig,
+            manifest,
+            onStart: beginOnline,
+            onMenu: showModes,
+          });
+        }
+        loading.hidden = true;
+        element('mode-menu', HTMLElement).hidden = true;
+        multiplayer.show();
+      })().catch(showError);
+    });
+    element('single-player', HTMLButtonElement).addEventListener('click', () => {
+      loading.hidden = true;
+      element('mode-menu', HTMLElement).hidden = true;
+      element('setup', HTMLElement).hidden = false;
+      element('start', HTMLButtonElement).focus();
+    });
+    element('single-back', HTMLButtonElement).addEventListener('click', showModes);
+    for (const id of ['single-player', 'multiplayer-button']) {
+      bitmapLabel(element(id, HTMLButtonElement));
     }
 
     const garage = new Garage({
@@ -99,12 +186,16 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       restartOptions = null;
       garageScreen.hidden = false;
       raceScreen.hidden = true;
-      element('start', HTMLButtonElement).focus();
+      if (onlineRace) {
+        onlineRace = false;
+        void multiplayer?.leave().then(() => multiplayer?.show());
+      } else {
+        element('start', HTMLButtonElement).focus();
+      }
     });
 
     loading.hidden = true;
-    element('setup', HTMLElement).hidden = false;
-    element('start', HTMLButtonElement).focus();
+    showModes();
   } catch (error) {
     showError(error);
   }

@@ -2,6 +2,7 @@
   "ignorePatterns": [
     "chatgpt-thread.md",
     ".local/**",
+    "**/dist/**",
     "public/assets/**",
     "public/config/schemas/**",
     "pnpm-lock.yaml"

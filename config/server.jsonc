@@ -1,0 +1,26 @@
+{
+  // Server-only settings. Restart after changing. PORT overrides port.
+  "name": "ToxoDrift server",
+  "port": 2567,
+  "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+  // Only trust the addresses/CIDRs of reverse proxies you operate. Empty means direct clients.
+  "trustedProxies": [],
+  "httpRequestsPerMinute": 180,
+  "patchRate": 20,
+  "inputRate": 35,
+  "inputTimeoutMs": 500,
+  "reconnectSeconds": 20,
+  "lobbyTimeoutSeconds": 600,
+  "finishGraceSeconds": 30,
+  "maxRooms": 32,
+  "ranking": {
+    "initialElo": 1000,
+    "kFactor": 32,
+    "scale": 400,
+    "finishPoints": [20, 12, 8, 5, 3, 1],
+    "aiBeatPoints": 2,
+    "soloMultiplier": 0.5,
+    "dailyPointsCap": 200,
+    "minRaceSeconds": 20,
+  },
+}

@@ -15,15 +15,21 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm build:server",
     "assets:download": "tsx scripts/download-assets.ts",
     "assets:import": "tsx scripts/import-assets.ts",
     "assets:setup": "pnpm assets:download && pnpm assets:import && pnpm assets:audio",
     "schemas": "tsx scripts/export-schemas.ts",
     "hooks:install": "lefthook install",
-    "assets:audio": "tsx scripts/import-audio.ts"
+    "assets:audio": "tsx scripts/import-audio.ts",
+    "dev:server": "pnpm --filter @toxodrift/server dev",
+    "dev:all": "node scripts/dev-all.mjs",
+    "build:server": "pnpm --filter @toxodrift/server build",
+    "start:server": "pnpm --filter @toxodrift/server start"
   },
   "dependencies": {
+    "@colyseus/schema": "^5.0.27",
+    "@colyseus/sdk": "^0.18.2",
     "jsonc-parser": "^3.3.1",
     "zod": "^4.5.4"
   },
@@ -31,6 +37,7 @@
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.5.0",
     "@types/pngjs": "^6.0.5",
+    "esbuild": "^0.27.7",
     "lefthook": "^2.1.12",
     "oxfmt": "^0.67.0",
     "oxlint": "^1.82.0",

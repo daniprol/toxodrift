@@ -30,7 +30,7 @@ const RaceConfigSchema = z
     maxRaceSeconds: PositiveNumberSchema,
     defaultTrack: z.string(),
     defaultCar: z.string(),
-    opponents: z.number().int().min(0).max(3),
+    opponents: z.union([z.literal(0), z.literal(1), z.literal(3), z.literal(5)]),
     weapons: z.boolean(),
   })
   .strict();
@@ -96,7 +96,10 @@ const DisplayConfigSchema = z
     height: z.number().int().min(200).max(1080),
     cameraLead: z.number().nonnegative(),
     maxFrameSeconds: PositiveNumberSchema,
-    colors: z.array(z.string().regex(/^#[0-9a-f]{6}$/i)).length(4),
+    colors: z
+      .array(z.string().regex(/^#[0-9a-f]{6}$/i))
+      .min(4)
+      .max(6),
   })
   .strict();
 

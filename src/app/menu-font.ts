@@ -8,7 +8,7 @@ const ADVANCES = [
 
 /** Real bitmap lettering with one accessible label, rather than announced individual letters. */
 export function bitmapLabel(element: HTMLElement): void {
-  const text = element.textContent ?? '';
+  const text = (element.textContent ?? '').trim().replace(/\s+/g, ' ');
   element.setAttribute('aria-label', text);
   const label = document.createElement('span');
   label.className = 'bitmap-text';

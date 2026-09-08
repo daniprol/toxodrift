@@ -3,6 +3,95 @@
     <div id="menu-stage">
       <h1 class="sr-only">Death Rally</h1>
       <p id="loading" role="status">Loading…</p>
+      <div id="mode-menu" class="metal-panel mode-menu" hidden>
+        <button id="single-player" class="menu-action" data-menu-row type="button">
+          Single player
+        </button>
+        <button id="multiplayer-button" class="menu-action" data-menu-row type="button">
+          Multiplayer
+        </button>
+      </div>
+      <section id="multiplayer" class="metal-panel online-panel" aria-label="Multiplayer" hidden>
+        <div class="online-heading">
+          <h2 id="online-title">Multiplayer</h2>
+          <button id="online-back" type="button">Back</button>
+        </div>
+        <p id="online-status" role="status"></p>
+        <div id="servers-panel">
+          <label>Server<select id="server-list" aria-label="Server"></select></label>
+          <form id="add-server" class="online-inline">
+            <label
+              >New server<input
+                id="server-address"
+                placeholder="https://racing.example.com"
+                required
+                maxlength="200"
+            /></label>
+            <button type="submit">Add server</button>
+          </form>
+          <label>Driver name<input id="driver-name" value="Racer" maxlength="16" required /></label>
+          <p class="online-help">
+            Driver identity is saved in this browser for each server. Clearing browser data loses
+            access.
+          </p>
+          <button id="connect-server" type="button">Connect</button>
+        </div>
+        <div id="races-panel" hidden>
+          <div class="online-heading">
+            <button id="refresh-races" type="button">Refresh races</button
+            ><button id="show-leaderboard" type="button">Leaderboard</button>
+          </div>
+          <div class="race-browser">
+            <form id="online-create">
+              <label>Circuit<select id="online-track"></select></label>
+              <label>Car class<select id="online-car"></select></label>
+              <label
+                >Total cars<select id="online-participants">
+                  <option>2</option>
+                  <option selected>4</option>
+                  <option>6</option>
+                </select></label
+              >
+              <label>AI cars<select id="online-ai"></select></label>
+              <label
+                >Laps<input id="online-laps" type="number" min="1" max="99" value="4" required
+              /></label>
+              <label>Weapons<input id="online-weapons" type="checkbox" checked /></label>
+              <button type="submit">Create race</button>
+            </form>
+            <div>
+              <h3>Open races</h3>
+              <div id="open-races"></div>
+            </div>
+          </div>
+        </div>
+        <div id="lobby-panel" hidden>
+          <p id="lobby-settings"></p>
+          <ol id="lobby-drivers"></ol>
+          <p id="lobby-slots"></p>
+          <label>Ready to race<input id="online-ready" type="checkbox" /></label>
+          <button id="online-start" type="button">Start race</button>
+          <p class="online-help">
+            The creator chooses the car class for everyone. All human slots must be ready.
+          </p>
+        </div>
+        <div id="leaderboard-panel" hidden>
+          <p class="online-help">
+            Elo measures results against humans. Points reward finishing and beating AI.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Driver</th>
+                <th>Elo</th>
+                <th>Points</th>
+                <th>Wins</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-rows"></tbody>
+          </table>
+        </div>
+      </section>
       <div id="setup" hidden>
         <form id="race-form" class="metal-panel">
           <div class="menu-choice">
@@ -22,12 +111,12 @@
             ><input id="laps" data-menu-row type="number" min="1" max="99" required
           /></label>
           <label class="menu-setting"
-            ><span>Opponents</span
+            ><span>Cars</span
             ><select id="opponents" data-menu-row>
               <option value="0">Solo practice</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
+              <option value="1">2 cars</option>
+              <option value="3">4 cars</option>
+              <option value="5">6 cars</option>
             </select></label
           >
           <label class="menu-setting"
@@ -45,7 +134,8 @@
           <span id="car-speed"></span>
         </aside>
         <div class="menu-footer">
-          <span>↑ ↓ Select · ← → Change · Enter Confirm</span
+          <button id="single-back" type="button">Main menu</button>
+          <span>↑ ↓ Select · ← → Change</span
           ><button id="fullscreen" type="button">Full screen</button>
         </div>
       </div>
@@ -63,6 +153,7 @@
     <canvas id="hud-canvas" width="64" height="200" aria-label="Race instruments"></canvas>
     <div class="viewport">
       <canvas id="race-canvas" tabindex="0" aria-label="Race track"></canvas>
+      <p id="network-status" role="status" hidden></p>
       <div class="race-actions">
         <button id="race-fullscreen" type="button">Full screen</button>
         <button id="sound" type="button">Sound on</button

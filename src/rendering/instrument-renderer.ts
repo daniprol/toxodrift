@@ -32,7 +32,7 @@ export class InstrumentRenderer {
     this.image = context.createImageData(WIDTH, HEIGHT);
     this.palette = options.assets.palette.slice();
     // Match the four original paint ramps to the cars used by this race.
-    options.config.display.colors.forEach((color, racer) => {
+    options.config.display.colors.slice(0, 4).forEach((color, racer) => {
       const rgb = [1, 3, 5].map((offset) => Number.parseInt(color.slice(offset, offset + 2), 16));
       for (let shade = 0; shade < 10; shade++) {
         for (let channel = 0; channel < 3; channel++) {
@@ -86,6 +86,35 @@ export class InstrumentRenderer {
   private drawStandings(state: RaceState): void {
     const { config, setup } = this.options;
     const order = standings(state);
+    if (state.racers.length > 4) {
+      const lap = Math.min(setup.laps, state.racers[0]!.completedLaps + 1);
+      if (setup.laps < 10) {
+        this.number(lap, 2, 90);
+        this.number(setup.laps, 21, 90);
+      } else {
+        this.clear(1, 90, 31, 10);
+        this.text(`${lap}/${setup.laps}`, 1, 93);
+      }
+      this.text(
+        `${order.findIndex((racer) => racer.id === state.racers[0]!.id) + 1}/${order.length}`,
+        36,
+        78,
+      );
+      order.forEach((racer, index) => {
+        const y = 104 + index * 16;
+        this.text(`${index + 1} ${racer.name}`.slice(0, 10), 2, y);
+        this.text(
+          racer.health <= 0
+            ? 'OUT'
+            : racer.finishedAt !== null
+              ? 'FIN'
+              : `L${racer.completedLaps + 1}`,
+          40,
+          y + 7,
+        );
+      });
+      return;
+    }
     state.racers.forEach((racer, index) => {
       const position = order.findIndex((entry) => entry.id === racer.id);
       if (index > 0) {

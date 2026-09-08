@@ -1,3 +1,5 @@
+# Check the entire workspace, including shared game code and the multiplayer server.
+# Keep hooks read-only; run pnpm format to apply formatting before staging changes.
 pre-commit:
   parallel: true
   commands:

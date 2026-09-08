@@ -1,0 +1,21 @@
+services:
+  server:
+    build:
+      context: .
+      target: server
+    ports:
+      - '2567:2567'
+    environment:
+      ALLOWED_ORIGINS: http://localhost:8080,http://localhost:5173
+    volumes:
+      - rankings:/data
+    restart: unless-stopped
+  client:
+    build:
+      context: .
+      target: client
+    ports:
+      - '8080:80'
+    profiles: [client]
+volumes:
+  rankings:

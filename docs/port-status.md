@@ -36,7 +36,7 @@ The [DOS Games Archive freeware download page](https://www.dosgamesarchive.com/f
 - Engine playback loops the sample rather than emulating the original XM ping-pong loop and mixer. Music is rendered once and looped by the browser; tracker transitions and exact original mixer timing are not emulated.
 - Calculations use JavaScript doubles rather than every original float32 rounding point. There is no recorded input/trajectory comparison against a running original executable yet.
 - Recover-to-checkpoint and the race time limit are convenience rules in this port. Recovery never awards checkpoints.
-- Campaign progression, garage upgrades, economy, saves, original menu flow, Adversary progression and multiplayer remain out of scope of this racing implementation.
+- Campaign progression, garage upgrades, economy, saves, original menu flow, Adversary progression and the original multiplayer protocol remain out of scope of this racing implementation. ToxoDrift has a separate authoritative Colyseus multiplayer mode with 2/4/6-car races and server-local rankings; see [multiplayer](multiplayer.md).
 
 ## Verification
 

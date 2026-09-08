@@ -18,7 +18,15 @@ export function installMenuNavigation(
       buttons[(Math.max(0, index) + step + buttons.length) % buttons.length]!.focus();
       return;
     }
-    const rows = [...document.querySelectorAll<HTMLElement>('[data-menu-row]')];
+    const rows = [...document.querySelectorAll<HTMLElement>('[data-menu-row]')].filter(
+      (row) => row.getClientRects().length > 0,
+    );
+    if (
+      !rows.length ||
+      (event.target instanceof HTMLElement && event.target.closest('#multiplayer'))
+    ) {
+      return;
+    }
     const active = document.activeElement;
     const index = rows.findIndex((row) => row === active);
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {

@@ -68,7 +68,7 @@
     "height": 200,
     "cameraLead": 35,
     "maxFrameSeconds": 0.1,
-    "colors": ["#bedb43", "#dc6358", "#6caaca", "#e8bc5e"],
+    "colors": ["#bedb43", "#dc6358", "#6caaca", "#e8bc5e", "#bb87dc", "#eeeece"],
   },
   "audio": {
     "enabled": true,

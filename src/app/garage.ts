@@ -85,7 +85,13 @@ export class Garage {
       bitmapLabel(html(id));
     }
     for (const label of html('race-form').querySelectorAll<HTMLElement>('.menu-setting > span')) {
+      const control = label.parentElement?.querySelector('input, select');
+      if (control && !control.hasAttribute('aria-label')) {
+        control.setAttribute('aria-label', label.textContent ?? '');
+      }
       bitmapLabel(label);
+      label.removeAttribute('aria-label');
+      label.setAttribute('aria-hidden', 'true');
     }
     this.refresh();
   }

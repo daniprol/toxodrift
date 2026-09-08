@@ -221,3 +221,106 @@
   position: absolute;
   inset: 0;
 }
+.mode-menu {
+  position: absolute;
+  left: 108px;
+  top: 155px;
+  width: 424px;
+  padding: 36px;
+  display: grid;
+  gap: 28px;
+}
+.online-panel {
+  position: absolute;
+  top: 98px;
+  left: 28px;
+  width: 584px;
+  height: 342px;
+  padding: 14px;
+  overflow-y: auto;
+  font-size: 15px;
+}
+.online-heading,
+.online-inline {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.online-panel h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: normal;
+}
+.online-panel h3 {
+  margin: 8px 0;
+  font-size: 16px;
+}
+.online-panel label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+.online-panel select,
+.online-panel input {
+  min-width: 0;
+  width: 205px;
+  padding: 3px;
+  font-size: 14px;
+  color-scheme: dark;
+}
+.online-panel input[type='checkbox'] {
+  width: 20px;
+}
+.online-panel input[type='number'] {
+  width: 65px;
+}
+.online-inline label {
+  flex: 1;
+}
+.online-help {
+  color: #b5a085;
+  font-size: 13px;
+  line-height: 1.4;
+}
+#online-status {
+  color: #f3c177;
+  margin: 6px 0;
+  min-height: 18px;
+}
+.race-browser {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+.race-browser select {
+  width: 135px;
+}
+#open-races button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 6px 0;
+  font-size: 13px;
+}
+.online-panel table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.online-panel th,
+.online-panel td {
+  padding: 6px;
+  border-bottom: 1px solid #66513c;
+  text-align: left;
+}
+#network-status {
+  position: absolute;
+  top: 42px;
+  left: 8px;
+  z-index: 3;
+  padding: 6px;
+  background: #130503df;
+  color: #f3c177;
+}

@@ -8,12 +8,13 @@ test('driver can choose a race, drive, use weapons, pause, restart and return to
   page.on('pageerror', (error) => errors.push(error.message));
   await page.clock.install();
   await page.goto('/');
+  await page.getByRole('button', { name: 'Single player', exact: true }).click();
   await page.getByRole('button', { name: 'Circuit', exact: true }).click();
   await page.getByRole('button', { name: 'Suburbia', exact: true }).click();
   await page.getByRole('button', { name: 'Car', exact: true }).click();
   await page.getByRole('button', { name: 'Dervish 65 mph' }).click();
-  await page.getByLabel('Laps', { exact: true }).fill('2');
-  await page.getByLabel('Opponents', { exact: true }).selectOption('0');
+  await page.locator('#race-form').getByLabel('Laps', { exact: true }).fill('2');
+  await page.getByLabel('Cars', { exact: true }).selectOption('0');
   await page.getByRole('button', { name: 'Start race' }).click();
 
   const track = page.locator('#race-canvas');
@@ -63,8 +64,9 @@ test('driver can choose a race, drive, use weapons, pause, restart and return to
 test('a spectator sees a complete original-track race and the results', async ({ page }) => {
   await page.clock.install();
   await page.goto('/');
-  await page.getByLabel('Laps', { exact: true }).fill('1');
-  await page.getByLabel('Opponents', { exact: true }).selectOption('0');
+  await page.getByRole('button', { name: 'Single player', exact: true }).click();
+  await page.locator('#race-form').getByLabel('Laps', { exact: true }).fill('1');
+  await page.getByLabel('Cars', { exact: true }).selectOption('0');
   await page.getByLabel('Weapons enabled').uncheck();
   await page.getByRole('button', { name: 'Watch a race' }).click();
 
@@ -82,12 +84,13 @@ test('missing assets produce actionable setup instructions', async ({ page }) =>
   );
   await page.goto('/');
 
-  await expect(page.getByRole('status')).toContainText('pnpm assets:setup');
+  await expect(page.locator('#loading')).toContainText('pnpm assets:setup');
 });
 
 test('the garage fits a phone viewport and supports keyboard selection', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
+  await page.getByRole('button', { name: 'Single player', exact: true }).click();
 
   await page.getByRole('button', { name: 'Car', exact: true }).click();
   const car = page.getByRole('button', { name: 'Sentinel 80 mph' });
@@ -116,7 +119,8 @@ test('custom bindings drive the car and describe the controls, regardless of car
   await page.route('**/config/game.jsonc', (route) => route.fulfill({ json: config }));
   await page.clock.install();
   await page.goto('/');
-  await page.getByLabel('Opponents', { exact: true }).selectOption('0');
+  await page.getByRole('button', { name: 'Single player', exact: true }).click();
+  await page.getByLabel('Cars', { exact: true }).selectOption('0');
 
   const engineRequest = page.waitForRequest('**/effect-25.wav');
   await page.getByRole('button', { name: 'Start race' }).click();
@@ -141,7 +145,8 @@ test('custom bindings drive the car and describe the controls, regardless of car
 test('losing focus pauses the race and clears held controls before resuming', async ({ page }) => {
   await page.clock.install();
   await page.goto('/');
-  await page.getByLabel('Opponents', { exact: true }).selectOption('0');
+  await page.getByRole('button', { name: 'Single player', exact: true }).click();
+  await page.getByLabel('Cars', { exact: true }).selectOption('0');
   await page.getByRole('button', { name: 'Start race' }).click();
   await expect(page.locator('#race-canvas')).toHaveAttribute('data-phase', 'countdown');
   await page.clock.runFor(3500);
@@ -173,6 +178,7 @@ test('a failed track load returns to editable setup and can be retried', async (
     { times: 1 },
   );
   await page.goto('/');
+  await page.getByRole('button', { name: 'Single player', exact: true }).click();
   await page.getByRole('button', { name: 'Start race' }).click();
 
   await expect(page.locator('#loading')).toContainText('Unable to load tr1-terrain.bin');

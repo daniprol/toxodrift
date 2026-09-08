@@ -1,3 +1,4 @@
+import { startingGrid } from './grid';
 import { raceArmor } from './damage';
 import { drivingFactors, sampleMap } from '../assets/track';
 import { driveOpponent } from './ai';
@@ -15,7 +16,7 @@ import {
 } from './types';
 
 // Duke Nukem (driver 1) receives the original 2.2× armor bonus, capped at 900.
-const OPPONENT_NAMES = ['You', 'Duke Nukem', 'Jane Honda', 'Nasty Nick'];
+const OPPONENT_NAMES = ['You', 'Duke Nukem', 'Jane Honda', 'Nasty Nick', 'Motor Mary', 'Mad Mac'];
 const MINIMUM_MOVEMENT_PER_TICK = 0.2;
 const PICKUP_KINDS = ['repair', 'ammo', 'turbo'] as const;
 
@@ -39,22 +40,32 @@ export class Race {
       throw new Error('Laps must be between 1 and 99');
     }
 
-    if (!Number.isInteger(options.opponents) || options.opponents < 0 || options.opponents > 3) {
-      throw new Error('Opponents must be between 0 and 3');
+    if (!Number.isInteger(options.opponents) || options.opponents < 0 || options.opponents > 5) {
+      throw new Error('Opponents must be between 0 and 5');
     }
 
-    const racers: Racer[] = track.definition.starts
-      .slice(0, options.opponents + 1)
-      .map((start, id) => ({
+    const racers: Racer[] = startingGrid(
+      track,
+      options.opponents + 1,
+      config.physics.collisionRadius,
+    ).map((start, id) => {
+      const driver = options.drivers?.find((entry) => entry.id === id);
+      const racerCar = driver ? config.cars.find((entry) => entry.id === driver.carId) : car;
+      if (!racerCar) {
+        throw new Error(`Unknown car: ${driver?.carId}`);
+      }
+      return {
         ...start,
         id,
-        name: OPPONENT_NAMES[id]!,
-        car,
+        name: driver?.name ?? OPPONENT_NAMES[id]!,
+        car: racerCar,
         speed: 0,
         steeringMemory: 0,
         slip: 0,
         health: config.combat.health,
-        armor: raceArmor(car.armor, id === 0, id === 1 ? 2.2 : 1),
+        armor: options.drivers
+          ? raceArmor(racerCar.armor, true)
+          : raceArmor(racerCar.armor, id === 0, id === 1 ? 2.2 : 1),
         velocity: { x: 0, y: 0 },
         collisionVelocity: { x: 0, y: 0 },
         collisionTurn: 0,
@@ -73,7 +84,8 @@ export class Race {
         recoveryTicks: 0,
         lastSafePosition: { x: start.x, y: start.y },
         lastSafeDirection: start.direction,
-      }));
+      };
+    });
     this.state = {
       phase: config.race.countdownSeconds > 0 ? 'countdown' : 'racing',
       tick: 0,
@@ -93,6 +105,23 @@ export class Race {
     };
   }
 
+  /** Server deadlines end the world through the same transition as natural completion. */
+  finish(): void {
+    this.state.phase = 'finished';
+  }
+
+  /** A departed human stays in the standings but can no longer move or finish. */
+  forfeitDriver(id: number): boolean {
+    const racer = this.state.racers.find((entry) => entry.id === id);
+    if (!racer || racer.finishedAt !== null || this.state.phase === 'finished') {
+      return false;
+    }
+    racer.health = 0;
+    racer.speed = 0;
+    racer.velocity = { x: 0, y: 0 };
+    return true;
+  }
+
   togglePause(): void {
     if (this.state.phase === 'finished') {
       return;
@@ -106,12 +135,16 @@ export class Race {
     }
   }
 
-  recoverPlayer(): void {
+  recoverPlayer(id = 0): void {
     if (this.state.phase !== 'racing') {
       return;
     }
 
-    const player = this.state.racers[0]!;
+    const player = this.state.racers.find((racer) => racer.id === id);
+
+    if (!player) {
+      return;
+    }
 
     if (player.health <= 0 || player.finishedAt !== null) {
       return;
@@ -139,7 +172,7 @@ export class Race {
     player.stuckTicks = 0;
   }
 
-  step(playerInput: DriverInput = IDLE_INPUT): void {
+  step(playerInput: DriverInput = IDLE_INPUT, inputs?: ReadonlyMap<number, DriverInput>): void {
     const state = this.state;
 
     if (state.phase === 'paused' || state.phase === 'finished') {
@@ -164,7 +197,7 @@ export class Race {
     state.elapsed = state.tick / config.race.tickRate;
 
     for (const racer of state.racers) {
-      this.updateRacer(racer, playerInput);
+      this.updateRacer(racer, playerInput, inputs);
     }
 
     resolveCarCollisions({ racers: state.racers, track, config });
@@ -178,15 +211,19 @@ export class Race {
     const player = state.racers[0]!;
 
     if (
-      (!spectate && (player.finishedAt !== null || player.health <= 0)) ||
+      (!this.options.drivers && !spectate && (player.finishedAt !== null || player.health <= 0)) ||
       state.racers.every((racer) => racer.finishedAt !== null || racer.health <= 0) ||
       state.elapsed >= config.race.maxRaceSeconds
     ) {
-      state.phase = 'finished';
+      this.finish();
     }
   }
 
-  private updateRacer(racer: Racer, playerInput: DriverInput): void {
+  private updateRacer(
+    racer: Racer,
+    playerInput: DriverInput,
+    inputs?: ReadonlyMap<number, DriverInput>,
+  ): void {
     const { config, track, weapons, spectate } = this.options;
     const state = this.state;
     const secondsPerTick = 1 / config.race.tickRate;
@@ -196,17 +233,21 @@ export class Race {
       return;
     }
 
-    const input =
-      racer.id === 0 && !spectate
-        ? playerInput
-        : driveOpponent({ racer, racers: state.racers, track, config });
+    const human = this.options.drivers
+      ? this.options.drivers.some((driver) => driver.id === racer.id)
+      : racer.id === 0 && !spectate;
+    const input = human
+      ? this.options.drivers
+        ? (inputs?.get(racer.id) ?? IDLE_INPUT)
+        : playerInput
+      : driveOpponent({ racer, racers: state.racers, track, config });
     const zone = sampleMap({ track, map: 'checkpoints', x: racer.x, y: racer.y });
     const previousPosition = { x: racer.x, y: racer.y };
     const movement = integrateCar({
       racer,
       input,
       config,
-      steeringScale: racer.id === 0 && !spectate ? 1 : drivingFactors(track, zone).steering,
+      steeringScale: human ? 1 : drivingFactors(track, zone).steering,
     });
     racer.collisionCooldown = Math.max(0, racer.collisionCooldown - 1);
     moveCar({ racer, movement, track, config });

@@ -11,6 +11,7 @@ async function expectViewportFit(page: import('@playwright/test').Page): Promise
 
 test('arrow keys edit setup and reach every circuit without scrolling', async ({ page }) => {
   await page.goto('/');
+  await page.getByRole('button', { name: 'Single player', exact: true }).click();
   await expect(page.locator('#start')).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('ArrowDown');
@@ -33,7 +34,7 @@ test('arrow keys edit setup and reach every circuit without scrolling', async ({
   await expect(page.locator('#laps')).toHaveValue('5');
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('ArrowRight');
-  await expect(page.locator('#opponents')).toHaveValue('0');
+  await expect(page.locator('#opponents')).toHaveValue('5');
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('ArrowLeft');
   await expect(page.locator('#weapons')).not.toBeChecked();
@@ -43,6 +44,7 @@ test('arrow keys edit setup and reach every circuit without scrolling', async ({
 test('race fills wide and short viewports without distorting the pixel scale', async ({ page }) => {
   await page.setViewportSize({ width: 1600, height: 720 });
   await page.goto('/');
+  await page.getByRole('button', { name: 'Single player', exact: true }).click();
   await page.locator('#start').click();
   await expect(page.locator('#race-canvas')).toBeVisible();
   for (const viewport of [
@@ -75,6 +77,7 @@ test.describe('landscape touch controls', () => {
   }) => {
     await page.clock.install();
     await page.goto('/');
+    await page.getByRole('button', { name: 'Single player', exact: true }).click();
     await page.locator('#choose-track').click();
     const lastCircuit = page.locator('#tracks button').last();
     await expect(lastCircuit).toBeInViewport();
@@ -132,6 +135,7 @@ test.describe('landscape touch controls', () => {
   }) => {
     await page.clock.install();
     await page.goto('/');
+    await page.getByRole('button', { name: 'Single player', exact: true }).click();
     await page.locator('#opponents').selectOption('0');
     await page.locator('#weapons').uncheck();
     await page.locator('#start').click();
@@ -172,6 +176,7 @@ test.describe('landscape touch controls', () => {
 
 test('browser fullscreen can be entered from setup and exited during a race', async ({ page }) => {
   await page.goto('/');
+  await page.getByRole('button', { name: 'Single player', exact: true }).click();
   await page.locator('#fullscreen').click();
   await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
   await expect(page.locator('#fullscreen')).toHaveText('Exit full screen');

@@ -6,7 +6,7 @@ The browser's `RaceSession` composes a `Race`, `Keyboard`, `TouchControls`, `Fix
 
 ## Where to start reading
 
-1. `src/main.ts` loads styles and starts the application. `src/app/application.ts` loads configuration and switches between the garage and a race session.
+1. `src/main.ts` loads styles and starts the application. `src/app/application.ts` loads configuration and switches between mode selection, the garage, multiplayer and a race session.
 2. `src/app/garage.ts` owns editable race choices. It emits a `GarageSelection` snapshot before asset loading; setup controls stay disabled during loading. `RaceSetup` describes those choices without browser or asset dependencies.
 3. `src/app/race-session.ts` owns one race's browser lifecycle. `race-hud.ts` updates accessible telemetry and results. `InstrumentRenderer` draws the original 64×200 instrument art from live race state, with separate player, standings and presentation steps. `view.html` holds the formatted markup; `control-bindings.ts` generates pause-screen and accessible help from the active bindings. `menu-navigation.ts` owns arrow-key navigation; `menu-font.ts` displays the original bitmap lettering.
 4. `src/race/race.ts` shows the simulation's tick order. Its internal racer update delegates driving, movement and weapons to their domain modules. Renderers and audio only observe the resulting state.
@@ -46,3 +46,11 @@ The race instrument canvas stays 64×200 and fills viewport height. A `ResizeObs
 `TouchControls` owns a floating `Joystick` and tracks action-button pointers by ID. Pointer capture handles release outside the activation area. `Joystick` owns its dead zone, axis normalization and thumb feedback, exposing throttle/brake and optional analog steering through `DriverInput`. `DRIVING_BUTTONS` lists the shared boolean actions; analog steering is composed separately. The session combines touch and configured keyboard actions before each simulation tick. Pause, blur, portrait rotation and disposal clear held input. Browser fullscreen and orientation lock are optional enhancements; CSS viewport fitting works without them.
 
 `scripts/lib/import-interface.ts` checks the menu palette, explicit image dimensions and required instrument plane sizes before exporting each asset during normal import. `src/assets/interface.ts` documents instrument sizes and car sprite mappings. Instrument colors come from the active track palette, with car paint ramps matched to race colors. Original graphic files remain ignored by Git.
+
+## Multiplayer extension
+
+`server/` is a separate pnpm workspace with a headless Colyseus runtime. Both applications import the shared `src/race` simulation. Explicit driver slots and input maps allow multiple humans; online races wait for all racers or the server deadline. `src/network` owns the public protocol and observable schema. `RaceSession` uses either a local simulation clock or a `RemoteRace` snapshot observer. The server owns all online gameplay and persistent rankings. See [multiplayer architecture and operations](multiplayer.md) for the lifecycle, configuration, wire contract and deployment modes.
+
+Race setup offers 2/4/6 cars and solo practice. The authored four starts remain unchanged; additional starts are validated on drivable terrain behind the grid. The original instrument layout is preserved through four racers and switches to compact six-row standings for six racers.
+
+For online work, read `src/app/multiplayer.ts` for menu/lobby transitions, then `src/network/server-client.ts` for server connection and identity handling. Follow `server/src/race-room.ts` for the authoritative lifecycle. HTTP policy lives in `server/src/http.ts`; ranking rules live in `server/src/rankings.ts`, with persistence in `server/src/store.ts`. `server/src/index.ts` only assembles the process. Change gameplay in the shared simulation, not in either network adapter.

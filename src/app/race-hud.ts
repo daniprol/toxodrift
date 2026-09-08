@@ -35,7 +35,10 @@ export function updateRaceHud(options: RaceHudOptions): void {
   html('standings').replaceChildren(
     ...standings(state).map((racer, index) => {
       const row = document.createElement('li');
-      row.style.setProperty('--racer-color', config.display.colors[racer.id]!);
+      row.style.setProperty(
+        '--racer-color',
+        config.display.colors[racer.id % config.display.colors.length]!,
+      );
       row.textContent = `${index + 1}  ${racer.name}`;
 
       const status = document.createElement('span');
@@ -65,7 +68,7 @@ export function updateRaceHud(options: RaceHudOptions): void {
   }
 
   if (state.phase === 'finished') {
-    const position = standings(state).findIndex((racer) => racer.id === 0) + 1;
+    const position = standings(state).findIndex((racer) => racer.id === player.id) + 1;
     html('overlay-title').textContent = finishTitle({
       player,
       position,

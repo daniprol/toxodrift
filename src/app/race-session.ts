@@ -1,3 +1,4 @@
+import { RemoteRace, type OnlineRoom } from '../network/remote-race';
 import { TouchControls } from '../platform/touch-controls';
 import { InstrumentRenderer } from '../rendering/instrument-renderer';
 import { element } from './view';
@@ -19,6 +20,7 @@ interface RaceSessionOptions {
   assets: RaceAssets;
   config: GameConfig;
   setup: RaceSetup;
+  online?: { room: OnlineRoom; racerId: number; inputRate: number; interpolationMs: number };
 }
 
 /** Owns one running race, including its frame loop and browser subscriptions. */
@@ -26,6 +28,7 @@ export class RaceSession {
   private readonly touch: TouchControls;
   private readonly instruments: InstrumentRenderer;
   private readonly race: Race;
+  private readonly remote: RemoteRace | undefined;
   private readonly renderer: RaceRenderer;
   private readonly keyboard: Keyboard;
   private readonly audio: RaceAudio;
@@ -40,6 +43,9 @@ export class RaceSession {
     const { assets, config, canvas, setup } = options;
 
     this.race = new Race({ track: assets.track, config, ...setup });
+    this.remote = options.online
+      ? new RemoteRace({ ...options.online, template: this.race })
+      : undefined;
     this.renderer = new RaceRenderer({ canvas, assets, config });
     this.audio = new RaceAudio({
       config,
@@ -55,7 +61,7 @@ export class RaceSession {
       target: window,
       controls: config.controls,
       onPause: () => this.togglePause(),
-      onRecover: () => this.race.recoverPlayer(),
+      onRecover: () => this.recover(),
       onBlur: () => this.pauseWhenInactive(),
     });
 
@@ -75,7 +81,7 @@ export class RaceSession {
 
     this.touch = new TouchControls({
       root: element('touch-controls', HTMLElement),
-      onRecover: () => this.race.recoverPlayer(),
+      onRecover: () => this.recover(),
     });
     this.instruments = new InstrumentRenderer({
       canvas: element('hud-canvas', HTMLCanvasElement),
@@ -107,6 +113,10 @@ export class RaceSession {
   }
 
   togglePause(): void {
+    if (this.remote) {
+      this.pauseWhenInactive();
+      return;
+    }
     this.race.togglePause();
     this.keyboard.clear();
     this.touch.clear();
@@ -125,24 +135,40 @@ export class RaceSession {
   dispose(): void {
     cancelAnimationFrame(this.frameId);
     this.lifetime.abort();
+    this.remote?.dispose();
     this.keyboard.dispose();
     this.touch.dispose();
     this.renderer.dispose();
     this.audio.dispose();
   }
 
+  private recover(): void {
+    if (this.remote) {
+      this.remote.recover();
+    } else {
+      this.race.recoverPlayer();
+    }
+  }
+
   private pauseWhenInactive(): void {
+    if (this.remote) {
+      this.keyboard.clear();
+      this.touch.clear();
+      this.remote.clear();
+      return;
+    }
     if (this.race.state.phase === 'racing' || this.race.state.phase === 'countdown') {
       this.togglePause();
     }
   }
 
   private updateHud(): void {
-    const phase = this.race.state.phase;
+    const state = this.remote?.state(performance.now()) ?? this.race.state;
+    const phase = state.phase;
     element('touch-controls', HTMLElement).hidden =
       (this.options.setup.spectate ?? false) || phase === 'paused' || phase === 'finished';
     updateRaceHud({
-      state: this.race.state,
+      state,
       config: this.options.config,
       laps: this.options.setup.laps,
       spectate: this.options.setup.spectate ?? false,
@@ -162,10 +188,15 @@ export class RaceSession {
   }
 
   private frame = (timestamp: number): void => {
-    this.clock.advance(timestamp);
-    this.renderer.draw(this.race.state);
-    this.instruments.draw(this.race.state);
-    this.audio.update(this.race.state);
+    if (this.remote) {
+      this.remote.send(this.readInput(), timestamp);
+    } else {
+      this.clock.advance(timestamp);
+    }
+    const state = this.remote?.state(timestamp) ?? this.race.state;
+    this.renderer.draw(state);
+    this.instruments.draw(state);
+    this.audio.update(state);
 
     if (timestamp - this.lastHudUpdate >= HUD_REFRESH_MS) {
       this.updateHud();

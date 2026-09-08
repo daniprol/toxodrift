@@ -3,7 +3,7 @@
   "categories": {
     "correctness": "error"
   },
-  "ignorePatterns": [".local/**", "dist/**", "public/assets/**"],
+  "ignorePatterns": [".local/**", "**/dist/**", "public/assets/**"],
   "rules": {
     "curly": ["error", "all"]
   }
