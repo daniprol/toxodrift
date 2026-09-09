@@ -4,7 +4,7 @@ The browser game and the dedicated Colyseus server have separate entrypoints and
 
 ## Run and deploy
 
-Use Node 24+ for multiplayer and the complete test suite, pnpm 10, and the existing imported assets (`pnpm assets:setup`). Browser-only development still supports Node 20.19+.
+Use pnpm 10 and the existing imported assets (`pnpm assets:setup`). `pnpm-workspace.yaml` pins Node 24; pnpm downloads it on first use and selects it for project scripts and Git hooks, independently of your shell's Node version. Direct server execution outside pnpm requires Node 24+.
 
 | Task                          | Command                            | Output                                                              |
 | ----------------------------- | ---------------------------------- | ------------------------------------------------------------------- |

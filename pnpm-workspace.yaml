@@ -1,3 +1,5 @@
+# pnpm scripts and Git hooks use this runtime even when the shell runs an older Node.
+useNodeVersion: 24.20.0
 packages:
   - server
 onlyBuiltDependencies:

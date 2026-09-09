@@ -6,7 +6,7 @@ A browser-based TypeScript port of Death Rally's racing systems. Original assets
 
 ## Run
 
-Requires Node 20.19+ (Node 24 recommended), pnpm 10, 7-Zip (`7z`), and FFmpeg with libopenmpt.
+Requires pnpm 10, 7-Zip (`7z`), and FFmpeg with libopenmpt. Project commands use Node 24: pnpm automatically downloads and selects the exact version pinned in `pnpm-workspace.yaml`, including for Git hooks. Your shell can keep its existing Node version.
 
 ```sh
 pnpm install
@@ -29,7 +29,7 @@ The directory should contain uppercase `MENU.BPA`, `IBFILES.BPA`, `ENGINE.BPA`, 
 
 The opening menu offers **Single player** and **Multiplayer**. Connect to a saved/custom server or localhost, create or join a race, and mark ready. Choose 2, 4 or 6 total cars, a circuit, a shared car class and the number of AI. Each server maintains its own Elo leaderboard and configurable finish/AI progression points.
 
-Multiplayer and the full test suite require **Node 24+**. After asset setup:
+Multiplayer and the full test suite use the **pnpm-managed Node 24 runtime**. After asset setup:
 
 ```sh
 pnpm dev:all          # Browser + Colyseus server
