@@ -8,6 +8,8 @@ A browser-based TypeScript port of Death Rally's racing systems. Original assets
 
 Requires pnpm 10, 7-Zip (`7z`), and FFmpeg with libopenmpt. Project commands use Node 24: pnpm automatically downloads and selects the exact version pinned in `pnpm-workspace.yaml`, including for Git hooks. Your shell can keep its existing Node version.
 
+If you use nvm, run `nvm install` and `nvm use` to select the same version for your shell. Keep `.nvmrc` and `useNodeVersion` in sync when upgrading Node.
+
 ```sh
 pnpm install
 pnpm assets:setup
